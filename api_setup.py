@@ -12,7 +12,7 @@ load_dotenv()
 app = FastAPI()
 
 # Set OpenAI API key
-openai.api_key = os.getenv("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")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
