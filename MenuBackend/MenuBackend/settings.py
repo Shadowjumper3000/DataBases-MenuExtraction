@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'menu',
+    'database_handler',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'restaurants',  # Your database name
         'USER': 'root',  # Your MySQL username
-        'PASSWORD': 'password',  # Your MySQL password
+        'PASSWORD': 'rootpassword',  # Your MySQL password
         'HOST': 'localhost',  # Default to localhost
         'PORT': '3306',  # Default port for MySQL
     }

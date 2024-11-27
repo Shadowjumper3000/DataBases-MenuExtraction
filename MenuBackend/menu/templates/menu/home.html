@@ -1,4 +1,56 @@
-<!-- menu/templates/menu/home.html -->
-<h1>Welcome to the PDF Menu Processor!</h1>
-<p>Use the menu to upload a PDF and extract its content.</p>
-<a href="{% url 'upload_pdf' %}">Upload PDF</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        p {
+            text-align: center;
+            color: #666;
+        }
+        .upload-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .upload-link a {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .upload-link a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the PDF Menu Processor!</h1>
+        <p>Use the link below to upload a PDF and extract its content.</p>
+        <div class="upload-link">
+            <a href="{% url 'upload_pdf' %}">Upload PDF</a>
+        </div>
+    </div>
+</body>
+</html>
