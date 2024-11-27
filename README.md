@@ -34,12 +34,14 @@
     pip3 install -r requirements.txt
     ```
 
+### !!DEPRECATED, DJANGO WILL CREATE DATABASE WHEN RUNNING MIGRATIONS!!
 ### 4. Run `schema.sql` to create the database:
 - Ensure you have MySQL installed and running.
 - Execute the `schema.sql` file to create the database and tables:
     ```sh
     mysql -u your_username -p your_password < schema.sql
     ```
+### !!DEPRECATED, DJANGO WILL CREATE DATABASE WHEN RUNNING MIGRATIONS!!
 
 ### 5. Modify Django settings to use the new database:
 - Open `settings.py` in your Django project.
@@ -49,8 +51,8 @@
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'restaurants',
-            'USER': 'your_username',
-            'PASSWORD': 'your_password',
+            'USER': 'your_username', <- Change this
+            'PASSWORD': 'your_password', <- Change this
             'HOST': 'localhost',
             'PORT': '3306',
         }
