@@ -38,3 +38,26 @@ class MenuItem(models.Model):
     image_url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class DietaryRestriction(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField()
+
+
+class ItemRestriction(models.Model):
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    dietary_restriction = models.ForeignKey(
+        DietaryRestriction, on_delete=models.CASCADE
+    )
+
+    class Meta:
+        unique_together = ("menu_item", "dietary_restriction")
+
+
+class ProcessingLog(models.Model):
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    action = models.CharField(max_length=255)
+    description = models.TextField()
+    action_time = models.DateTimeField(auto_now_add=True)
+    performed_by = models.CharField(max_length=255)

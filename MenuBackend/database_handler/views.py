@@ -7,5 +7,3 @@ from django.conf import settings
 
 import MySQLdb
 import requests
-
-

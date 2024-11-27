@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import PDFUploadForm
 from .models import PDFUpload
 from .utils import extract_text_from_pdf
+from database_handler.utils import check_mysql_connection
 
 
 def upload_pdf(request):
@@ -49,4 +50,7 @@ def home(request):
     Returns:
     - Rendered HTML page for the homepage.
     """
-    return render(request, "menu/home.html")
+    db_connection_success = check_mysql_connection()
+    return render(
+        request, "menu/home.html", {"db_connection_success": db_connection_success}
+    )

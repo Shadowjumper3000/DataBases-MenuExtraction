@@ -42,11 +42,25 @@
         .upload-link a:hover {
             background-color: #0056b3;
         }
+        .db-connection-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Welcome to the PDF Menu Processor!</h1>
+        {% if db_connection_success %}
+        <div class="db-connection-success">
+            Successfully connected to the database.
+        </div>
+        {% endif %}
         <p>Use the link below to upload a PDF and extract its content.</p>
         <div class="upload-link">
             <a href="{% url 'upload_pdf' %}">Upload PDF</a>

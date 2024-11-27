@@ -13,10 +13,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Initialize FastAPI app
 app = FastAPI()
 
+
 # Define input schema
 class TextInput(BaseModel):
     text: str
     model: str = "gpt-4"  # Default model
+
 
 # Define API endpoint
 @app.post("/process-menu")
@@ -36,10 +38,10 @@ async def process_menu(input_data: TextInput):
         f"Input Text:\n{input_data.text}\n\n"
         "Output JSON Format:\n"
         "{\n"
-        "  \"menus\": [\n"
+        '  "menus": [\n'
         "    {\n"
-        "      \"section\": \"Section Name\",\n"
-        "      \"items\": [\"Item 1\", \"Item 2\"]\n"
+        '      "section": "Section Name",\n'
+        '      "items": ["Item 1", "Item 2"]\n'
         "    },\n"
         "    ...\n"
         "  ]\n"
@@ -52,10 +54,10 @@ async def process_menu(input_data: TextInput):
             model=input_data.model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             max_tokens=1000,
-            temperature=0.3  # Keep responses deterministic for structured tasks
+            temperature=0.3,  # Keep responses deterministic for structured tasks
         )
         return {"structured_menu": response.choices[0].message["content"]}
     except openai.error.OpenAIError as e:
