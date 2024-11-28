@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .menu-section {
+            margin-top: 20px;
+        }
+        .menu-item {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ restaurant.name }}</h1>
+        <p>{{ restaurant.address }}</p>
+        <div class="menus">
+            {% for section, items in sections.items %}
+            <div class="menu-section">
+                <h3>{{ section.name }}</h3>
+                <p>{{ section.description }}</p>
+                <div class="menu-items">
+                    {% for item in items %}
+                    <div class="menu-item">
+                        <p>{{ item.food_item.name }} - ${{ item.price }}</p>
+                        {% if item.food_item.description %}
+                        <p>{{ item.food_item.description }}</p>
+                        {% endif %}
+                        {% if item.food_item.fooditemrestriction_set.exists %}
+                        <p class="dietary-restrictions">
+                            Dietary Restrictions: 
+                            {% for restriction in item.food_item.fooditemrestriction_set.all %}
+                                {{ restriction.dietary_restriction.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

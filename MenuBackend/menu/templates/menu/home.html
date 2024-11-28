@@ -61,9 +61,15 @@
             Successfully connected to the database.
         </div>
         {% endif %}
-        <p>Use the link below to upload a PDF and extract its content.</p>
+        <p>Use the links below to upload a PDF or input JSON data and extract its content.</p>
         <div class="upload-link">
             <a href="{% url 'upload_pdf' %}">Upload PDF</a>
+        </div>
+        <div class="upload-link">
+            <a href="{% url 'upload_json' %}">Upload JSON</a>
+        </div>
+        <div class="upload-link">
+            <a href="{% url 'restaurant_list' %}">View Restaurants</a>
         </div>
     </div>
 </body>
