@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
-from .models import PDFUpload
-from database_handler.models import Restaurant, Menu, MenuSection, MenuItem
+from database_handler.models import Restaurant, MenuItem
 from .utils import extract_text_from_pdf
 from database_handler.utils import insert_menu_data, check_mysql_connection
 from collections import defaultdict
@@ -93,6 +92,7 @@ def restaurant_detail(request, restaurant_id):
     - Rendered HTML page with the restaurant's menu details.
     """
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+
     menu_items = (
         MenuItem.objects.filter(menu__restaurant=restaurant)
         .select_related("menu", "menu_section", "food_item")
@@ -102,12 +102,22 @@ def restaurant_detail(request, restaurant_id):
     # Group menu items by their sections
     sections = defaultdict(list)
     for item in menu_items:
-        sections[item.menu_section].append(item)
+        sections[item.menu_section.name].append(
+            {
+                "food_item": item.food_item.name,
+                "price": float(item.price),  # Convert Decimal to float
+                "description": item.food_item.description,
+                "dietary_restrictions": [
+                    restriction.dietary_restriction.name
+                    for restriction in item.food_item.fooditemrestriction_set.all()
+                ],
+            }
+        )
 
     return render(
         request,
         "menu/restaurant_detail.html",
-        {"restaurant": restaurant, "sections": sections},
+        {"restaurant": restaurant, "sections_json": json.dumps(sections)},
     )
 
 

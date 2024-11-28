@@ -1,76 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        p {
-            text-align: center;
-            color: #666;
-        }
-        .upload-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .upload-link a {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .upload-link a:hover {
-            background-color: #0056b3;
-        }
-        .db-connection-success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border: 1px solid #c3e6cb;
-            border-radius: 4px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to the PDF Menu Processor!</h1>
-        {% if db_connection_success %}
-        <div class="db-connection-success">
-            Successfully connected to the database.
-        </div>
-        {% endif %}
-        <p>Use the links below to upload a PDF or input JSON data and extract its content.</p>
-        <div class="upload-link">
-            <a href="{% url 'upload_pdf' %}">Upload PDF</a>
-        </div>
-        <div class="upload-link">
-            <a href="{% url 'upload_json' %}">Upload JSON</a>
-        </div>
-        <div class="upload-link">
-            <a href="{% url 'restaurant_list' %}">View Restaurants</a>
-        </div>
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to the PDF Menu Processor!</h1>
+{% if db_connection_success %}
+<div class="db-connection-success">
+    Successfully connected to the database.
+</div>
+{% endif %}
+<p>Use the links below to upload a PDF or input JSON data and extract its content.</p>
+<div class="upload-link">
+    <a href="{% url 'upload_pdf' %}">Upload PDF</a>
+</div>
+<div class="upload-link">
+    <a href="{% url 'upload_json' %}">Upload JSON</a>
+</div>
+<div class="upload-link">
+    <a href="{% url 'restaurant_list' %}">View Restaurants</a>
+</div>
+{% endblock %}

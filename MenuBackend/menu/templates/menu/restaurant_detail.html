@@ -1,66 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ restaurant.name }} - Menu</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .menu-section {
-            margin-top: 20px;
-        }
-        .menu-item {
-            margin-left: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ restaurant.name }}</h1>
-        <p>{{ restaurant.address }}</p>
-        <div class="menus">
-            {% for section, items in sections.items %}
-            <div class="menu-section">
-                <h3>{{ section.name }}</h3>
-                <p>{{ section.description }}</p>
-                <div class="menu-items">
-                    {% for item in items %}
-                    <div class="menu-item">
-                        <p>{{ item.food_item.name }} - ${{ item.price }}</p>
-                        {% if item.food_item.description %}
-                        <p>{{ item.food_item.description }}</p>
-                        {% endif %}
-                        {% if item.food_item.fooditemrestriction_set.exists %}
-                        <p class="dietary-restrictions">
-                            Dietary Restrictions: 
-                            {% for restriction in item.food_item.fooditemrestriction_set.all %}
-                                {{ restriction.dietary_restriction.name }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
+{% extends 'base.html' %}
+
+{% block title %}{{ restaurant.name }} - Menu{% endblock %}
+
+{% block content %}
+<h1>{{ restaurant.name }}</h1>
+<p>{{ restaurant.address }}</p>
+<div id="menus"></div>
+<script>
+    const sections = JSON.parse('{{ sections_json|escapejs }}');
+
+    const menusContainer = document.getElementById('menus');
+    for (const [sectionName, items] of Object.entries(sections)) {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.classList.add('menu-section');
+        sectionDiv.innerHTML = `<h3>${sectionName}</h3>`;
+        
+        const itemsDiv = document.createElement('div');
+        itemsDiv.classList.add('menu-items');
+        
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('menu-item');
+            itemDiv.innerHTML = `
+                <div>
+                    <p>${item.food_item}</p>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</body>
-</html>
+                <div class="description">
+                    <p>$${item.price.toFixed(2)}</p>
+                    ${item.description ? `<p>${item.description}</p>` : ''}
+                    ${item.dietary_restrictions.length ? `
+                        <p class="dietary-restrictions">
+                            Dietary Restrictions: ${item.dietary_restrictions.join(', ')}
+                        </p>` : ''}
+                `;
+            itemsDiv.appendChild(itemDiv);
+        });
+        
+        sectionDiv.appendChild(itemsDiv);
+        menusContainer.appendChild(sectionDiv);
+    }
+</script>
+{% endblock %}
