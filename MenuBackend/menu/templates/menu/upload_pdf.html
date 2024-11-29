@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Upload Menu</h1>
-<div class="container">
+<div class="upload-container">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="file" accept="application/pdf" required>

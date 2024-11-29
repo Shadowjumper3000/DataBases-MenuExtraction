@@ -1,22 +1,49 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}RestaurantManager{% endblock %}
 
 {% block content %}
-<h1>Welcome to the PDF Menu Processor!</h1>
-{% if db_connection_success %}
-<div class="db-connection-success">
-    Successfully connected to the database.
-</div>
-{% endif %}
-<p>Use the links below to upload a PDF or input JSON data and extract its content.</p>
-<div class="upload-link">
-    <a href="{% url 'upload_pdf' %}">Upload PDF</a>
-</div>
-<div class="upload-link">
-    <a href="{% url 'upload_json' %}">Upload JSON</a>
-</div>
-<div class="upload-link">
-    <a href="{% url 'restaurant_list' %}">View Restaurants</a>
+<div class="main-content">
+    <div class="sidebar">
+        {% if db_connection_success %}
+        <div class="db-connection-success">
+            Successfully connected to the database.
+        </div>
+        {% else %}
+        <div class="db-connection-error">
+            Failed to connect to the database. {{ error_message }}
+        </div>
+        {% endif %}
+
+        {% if db_connection_success %}
+        <div class="analytics">
+            <h2>Analytics</h2>
+            <p>Total Restaurants: {{ total_restaurants }}</p>
+            <p>Total Menus: {{ total_menus }}</p>
+        </div>
+
+        <div class="recent-activity">
+            <h2>Recent Activity</h2>
+            <ul>
+                {% for restaurant in recent_restaurants %}
+                <li>{{ restaurant.name }} - Added on {{ restaurant.created_at }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="restaurant-suggestions">
+        <h1>Top 3 Restaurant Suggestions</h1>
+        <div class="suggestion-boxes">
+            {% for restaurant in recent_restaurants|slice:":3" %}
+            <div class="suggestion-box">
+                <h3>{{ restaurant.name }}</h3>
+                <p>{{ restaurant.address }}</p>
+                <a href="{% url 'restaurant_detail' restaurant.id %}">View Menu</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

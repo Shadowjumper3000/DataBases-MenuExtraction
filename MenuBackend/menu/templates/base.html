@@ -14,8 +14,8 @@
             padding: 0;
         }
         .container {
-            max-width: 800px;
-            margin: 50px auto;
+            max-width: 1200px;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -24,6 +24,7 @@
         h1 {
             text-align: center;
             color: #333;
+            margin-top: 0;
         }
         nav {
             text-align: center;
@@ -38,7 +39,7 @@
             font-weight: bold;
         }
         nav a:hover {
-            text-decoration: underline;
+            color: #000;;
         }
         .upload-link {
             margin: 10px 0;
@@ -59,6 +60,14 @@
             color: green;
             text-align: center;
             margin-bottom: 20px;
+        }
+        .db-connection-error {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .analytics {
+            text-align: center;
         }
         form {
             display: flex;
@@ -93,6 +102,8 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+            margin-left: 15%;
+            margin-right: 15%;
         }
         .menu-item p {
             margin: 0;
@@ -107,8 +118,9 @@
             color: #666;
         }
         .restaurant-list {
-            list-style-type: none;
-            padding: 0;
+            width: 100%;
+            padding: 20px;
+            text-align: center; /* Center the content */
         }
         .restaurant-list li {
             margin-bottom: 10px;
@@ -125,6 +137,50 @@
         .restaurant-list li a:hover {
             text-decoration: underline;
         }
+        .main-content {
+            display: flex;
+            width: 100%;
+        }
+        .sidebar {
+            width: 25%;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-right: 1px solid #ddd;
+        }
+        .restaurant-suggestions {
+            width: 75%;
+            padding: 20px;
+            text-align: center; /* Center the content */
+        }
+        .suggestion-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center; /* Center the suggestion boxes */
+        }
+        .suggestion-box {
+            width: calc(33.333% - 20px);
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .suggestion-box h3 {
+            margin-top: 0;
+        }
+        .suggestion-box a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .suggestion-box a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -132,7 +188,6 @@
         <a href="{% url 'home' %}">Home</a>
         <a href="{% url 'restaurant_list' %}">Restaurants</a>
         <a href="{% url 'upload_pdf' %}">Upload Menu</a>
-        <a href="{% url 'upload_json' %}">Upload JSON</a>
     </nav>
     <div class="container">
         {% block content %}{% endblock %}
