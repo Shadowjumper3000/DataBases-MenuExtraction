@@ -1,0 +1,19 @@
+<h1>Text Extraction Success</h1>
+
+<h2>Structured Menu:</h2>
+{% if structured_menu %}
+    <ul>
+    {% for section in structured_menu.menus %}
+        <li>
+            <strong>{{ section.section }}</strong>
+            <ul>
+                {% for item in section.items %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No structured menu available.</p>
+{% endif %}

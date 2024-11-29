@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Website{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #007BFF;
+            padding: 10px 0;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .upload-link {
+            margin: 10px 0;
+            text-align: center;
+        }
+        .upload-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .upload-link a:hover {
+            background-color: #0056b3;
+        }
+        .db-connection-success {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        form input[type="file"],
+        form textarea {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        .menu-section {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .menu-item p {
+            margin: 0;
+        }
+        .menu-item .description {
+            margin-left: 20px;
+            text-align: right;
+        }
+        .dietary-restrictions {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .restaurant-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .restaurant-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .restaurant-list li a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .restaurant-list li a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'restaurant_list' %}">Restaurants</a>
+        <a href="{% url 'upload_pdf' %}">Upload Menu</a>
+        <a href="{% url 'upload_json' %}">Upload JSON</a>
+    </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
