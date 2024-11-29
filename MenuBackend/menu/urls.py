@@ -1,7 +1,8 @@
 from django.urls import path
-from menu import views
+from .views import upload_pdf, process_text, home
 
 urlpatterns = [
+    path('process-text/', process_text, name='process_text'),
     path("", views.home, name="home"),  # Home page
     path("upload-pdf/", views.upload_pdf, name="upload_pdf"),  # PDF upload page
     path("upload-json/", views.upload_json, name="upload_json"),  # JSON upload page

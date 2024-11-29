@@ -1,6 +1,9 @@
 # Restaurant Menu Manager
 
 ## Features
+- Upload PDF menus and extract text
+- Process extracted text using OpenAI's GPT-4 model
+- Display structured menu data
 
 ## Installation
 
@@ -34,16 +37,7 @@
     pip3 install -r requirements.txt
     ```
 
-### !!DEPRECATED, DJANGO WILL CREATE DATABASE WHEN RUNNING MIGRATIONS!!
-### 4. Run `schema.sql` to create the database:
-- Ensure you have MySQL installed and running.
-- Execute the `schema.sql` file to create the database and tables:
-    ```sh
-    mysql -u your_username -p your_password < schema.sql
-    ```
-### !!DEPRECATED, DJANGO WILL CREATE DATABASE WHEN RUNNING MIGRATIONS!!
-
-### 5. Modify Django settings to use the new database:
+### 4. Modify Django settings to use the new database:
 - Open `settings.py` in your Django project.
 - Update the `DATABASES` setting to use the new database:
     ```python
@@ -51,15 +45,15 @@
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'restaurants',
-            'USER': 'your_username', <- Change this
-            'PASSWORD': 'your_password', <- Change this
+            'USER': 'your_username',  # Change this
+            'PASSWORD': 'your_password',  # Change this
             'HOST': 'localhost',
             'PORT': '3306',
         }
     }
     ```
 
-### 6. Apply the migrations:
+### 5. Apply the migrations:
 - For Windows
     ```sh
     python manage.py migrate
@@ -69,7 +63,7 @@
     python3 manage.py migrate
     ```
 
-### 7. Create a superuser:
+### 6. Create a superuser:
 - For Windows
     ```sh
     python manage.py createsuperuser
@@ -79,7 +73,7 @@
     python3 manage.py createsuperuser
     ```
 
-### 8. Run the development server:
+### 7. Run the Django development server:
 - For Windows
     ```sh
     python manage.py runserver
@@ -89,5 +83,21 @@
     python3 manage.py runserver
     ```
 
+### 8. Run the FastAPI server:
+- Navigate to the `Backend` directory:
+    ```sh
+    cd Backend
+    ```
+- Run the FastAPI server using Uvicorn:
+    ```sh
+    uvicorn FastApiApp.api_setup:app --host 0.0.0.0 --port 8001 --reload
+    ```
+
 ### 9. Access the application:
-Open your web browser and go to `http://127.0.0.1:8000/` or `http://127.0.0.1:8000/admin` for the admin interface.
+- Open your web browser and go to `http://127.0.0.1:8000/` for the Django application.
+- The FastAPI server will be running on `http://127.0.0.1:8001/`.
+
+## Notes
+- Ensure that both the Django and FastAPI servers are running simultaneously.
+- The Django application handles the PDF upload and text extraction.
+- The FastAPI application processes the extracted text using OpenAI's GPT-4 model.
