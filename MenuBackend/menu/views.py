@@ -4,12 +4,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
 from database_handler.models import Restaurant, MenuItem
 from .utils import extract_text_from_pdf
-from database_handler.utils import check_mysql_connection
+from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from database_handler.utils import insert_menu_data, check_mysql_connection
 from collections import defaultdict
-import json
+
 
 @csrf_exempt
 def upload_pdf(request):
@@ -37,6 +36,7 @@ def upload_pdf(request):
 
     return render(request, "menu/upload_pdf.html", {"form": form})
 
+
 @csrf_exempt
 def process_text(request):
     """
@@ -44,12 +44,11 @@ def process_text(request):
     """
     if request.method == "POST":
         extracted_text = request.POST.get("extracted_text")
-        pdf_id = request.POST.get("pdf_id")
 
         # Prepare the data for the FastAPI endpoint
         data = {
             "text": extracted_text,
-            "model": "gpt-4"  # Optional: specify the model if needed
+            "model": "gpt-4",  # Optional: specify the model if needed
         }
 
         # Call the FastAPI endpoint
@@ -68,9 +67,12 @@ def process_text(request):
                 {"structured_menu": structured_menu_parsed},
             )
         else:
-            return JsonResponse({"error": "Failed to process menu"}, status=response.status_code)
+            return JsonResponse(
+                {"error": "Failed to process menu"}, status=response.status_code
+            )
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
 
 def home(request):
     """
