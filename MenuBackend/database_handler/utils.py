@@ -1,32 +1,90 @@
-from .models import Restaurant, Menu, MenuSection, MenuItem
+from .models import (
+    Restaurant,
+    Menu,
+    MenuSection,
+    MenuItem,
+    FoodItem,
+    DietaryRestriction,
+    FoodItemRestriction,
+    ProcessingLog,
+)
 from django.conf import settings
 import MySQLdb
 
 
 def insert_menu_data(menu_data):
-    restaurant, created = Restaurant.objects.get_or_create(
-        name="Default Restaurant",  # Adjust as needed
-        defaults={"address": "Default Address"},
-    )
+    print("Inserting menu data:", menu_data)
 
+    # Insert restaurant data
+    restaurant_data = menu_data["restaurant"]
+    restaurant, created = Restaurant.objects.get_or_create(
+        name=restaurant_data["name"],
+        defaults={
+            "address": restaurant_data["address"],
+            "phone_number": restaurant_data["phone_number"],
+            "email": restaurant_data["email"],
+            "website": restaurant_data["website"],
+        },
+    )
+    print("Restaurant created:", restaurant)
+
+    # Create a menu for the restaurant
     menu = Menu.objects.create(
         restaurant=restaurant,
         name="Default Menu",  # Adjust as needed
         description="Generated menu",
     )
+    print("Menu created:", menu)
 
+    # Insert menu sections and items
     for section_data in menu_data["menus"]:
-        section = MenuSection.objects.create(
-            menu=menu, name=section_data["section"], position=0  # Adjust as needed
+        section, created = MenuSection.objects.get_or_create(
+            name=section_data["section"],
+            defaults={
+                "description": "",
+                "position": 0,  # Adjust as needed
+            },
         )
+        print("Menu section created:", section)
 
         for item_data in section_data["items"]:
-            MenuItem.objects.create(
-                menu_section=section,
-                name=item_data,
-                description="",
-                price=0.00,  # Adjust as needed
+            # Create or get the food item
+            food_item, created = FoodItem.objects.get_or_create(
+                name=item_data["name"],
+                defaults={
+                    "description": item_data.get("description", ""),
+                    "is_available": True,  # Adjust as needed
+                },
             )
+            print("Food item created:", food_item)
+
+            # Create the menu item linking the food item, menu, menu section, and price
+            menu_item = MenuItem.objects.create(
+                menu=menu,
+                menu_section=section,
+                food_item=food_item,
+                price=item_data.get("price", 0.00),  # Set price here
+            )
+            print("Menu item created:", menu_item)
+
+            # Insert dietary restrictions
+            for restriction in item_data.get("dietary_restrictions", []):
+                dietary_restriction, created = DietaryRestriction.objects.get_or_create(
+                    name=restriction
+                )
+                FoodItemRestriction.objects.create(
+                    food_item=food_item, dietary_restriction=dietary_restriction
+                )
+                print("Dietary restriction created:", dietary_restriction)
+
+    # Log the processing action
+    ProcessingLog.objects.create(
+        menu=menu,
+        action="Insert",
+        description="Inserted menu data from JSON",
+        performed_by="System",  # Adjust as needed
+    )
+    print("Processing log created for menu:", menu)
 
 
 def create_database_if_not_exists():
@@ -56,5 +114,5 @@ def check_mysql_connection():
         connection.close()
         return True
     except MySQLdb.Error as e:
-        print(f"Error connecting to MySQL: {e}")
+        print("Error connecting to MySQL:", e)
         return False

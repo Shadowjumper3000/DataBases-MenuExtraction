@@ -50,23 +50,28 @@ async def process_menu(input_data: TextInput):
         f"Extracted Text:\n{input_data.text}\n\n"
         "Output JSON format:\n"
         "{\n"
+        '  "restaurant": {\n'
+        '    "name": "Restaurant Name",\n'
+        '    "address": "Restaurant Address",\n'
+        '    "phone_number": "Restaurant Phone Number",\n'
+        '    "email": "Restaurant Email",\n'
+        '    "website": "Restaurant Website"\n'
+        "  },\n"
         '  "menus": [\n'
         "    {\n"
-        '      \"section\": \"Appetizers\",  # Example section\n'
-        '      \"items\": [\n'
-        '        \"Spring Rolls\",\n'
-        '        \"Garlic Bread\"\n'
-        '      ]\n'
-        "    },\n"
-        "    {\n"
-        '      \"section\": \"Main Course\",\n'
-        '      \"items\": [\n'
-        '        \"Grilled Salmon\",\n'
-        '        \"Steak\"\n'
-        '      ]\n'
+        '      "section": "Section Name",\n'
+        '      "items": [\n'
+        "        {\n"
+        '          "name": "Item Name",\n'
+        '          "description": "Item Description",\n'
+        '          "price": Item Price,\n'
+        '          "allergens": ["Allergen 1", "Allergen 2"],\n'
+        '          "dietary_restrictions": ["Vegetarian", "Gluten-Free"]\n'
+        "        }\n"
+        "      ]\n"
         "    }\n"
         "  ]\n"
-        "}"
+        "}\n"
     )
 
     try:
