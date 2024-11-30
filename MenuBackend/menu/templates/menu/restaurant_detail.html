@@ -30,7 +30,7 @@
                     ${item.description ? `<p>${item.description}</p>` : ''}
                     ${item.dietary_restrictions.length ? `
                         <p class="dietary-restrictions">
-                            Dietary Restrictions: ${item.dietary_restrictions.join(', ')}
+                            ${item.dietary_restrictions.join(', ')}
                         </p>` : ''}
                 `;
             itemsDiv.appendChild(itemDiv);
