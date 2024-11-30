@@ -1,19 +1,33 @@
-<h1>Text Extraction Success</h1>
+{% extends 'base.html' %}
 
-<h2>Structured Menu:</h2>
-{% if structured_menu %}
-    <ul>
-    {% for section in structured_menu.menus %}
-        <li>
-            <strong>{{ section.section }}</strong>
-            <ul>
-                {% for item in section.items %}
-                    <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No structured menu available.</p>
-{% endif %}
+{% block title %}Text Extraction Success{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Text Extraction Success</h1>
+    <h2>Structured Menu:</h2>
+    {% if structured_menu %}
+        <ul>
+        {% for section in structured_menu.menus %}
+            <li class="menu-section">
+                <strong>{{ section.section }}</strong>
+                <ul>
+                    {% for item in section.items %}
+                        <li class="menu-item">
+                            <p class="item-name">{{ item.name }}</p>
+                            <p class="item-price">${{ item.price }}</p>
+                            <p class="item-description">{{ item.description }}</p>
+                            {% if item.dietary_restrictions %}
+                                <p class="dietary-restrictions">Dietary Restrictions: {{ item.dietary_restrictions|join:", " }}</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No structured menu available.</p>
+    {% endif %}
+</div>
+{% endblock %}
