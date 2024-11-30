@@ -89,3 +89,4 @@
 ## Notes
 - The Django application handles the PDF upload and text extraction.
 - The FastAPI application processes the extracted text using OpenAI's GPT-4 model.
+- The database is created automatically on the host machine, so mysql must be installed and running.
