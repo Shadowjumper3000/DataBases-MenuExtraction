@@ -73,31 +73,19 @@
     python3 manage.py createsuperuser
     ```
 
-### 7. Run the Django development server:
+### 7. Run the Django and the FastAPI servers:
 - For Windows
     ```sh
-    python manage.py runserver
+    python run_servers.py
     ```
 - For Linux/macOS
     ```sh
-    python3 manage.py runserver
+    python3 run_servers.py
     ```
-
-### 8. Run the FastAPI server:
-- Navigate to the `Backend` directory:
-    ```sh
-    cd Backend
-    ```
-- Run the FastAPI server using Uvicorn:
-    ```sh
-    uvicorn FastApiApp.api_setup:app --host 0.0.0.0 --port 8001 --reload
-    ```
-
-### 9. Access the application:
+### 8. Access the application:
 - Open your web browser and go to `http://127.0.0.1:8000/` for the Django application.
 - The FastAPI server will be running on `http://127.0.0.1:8001/`.
 
 ## Notes
-- Ensure that both the Django and FastAPI servers are running simultaneously.
 - The Django application handles the PDF upload and text extraction.
 - The FastAPI application processes the extracted text using OpenAI's GPT-4 model.
