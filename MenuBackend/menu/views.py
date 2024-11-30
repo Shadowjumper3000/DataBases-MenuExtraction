@@ -52,13 +52,18 @@ def process_text(request):
         }
 
         # Call the FastAPI endpoint
-        response = requests.post("http://localhost:8001/process-menu", json=data, timeout=20)
+        response = requests.post(
+            "http://localhost:8001/process-menu", json=data, timeout=20
+        )
 
         if response.status_code == 200:
             structured_menu = response.json().get("structured_menu")
 
             # Ensure structured_menu is a proper Python object (JSON string needs parsing)
             structured_menu_parsed = json.loads(structured_menu)
+
+            # Insert the structured menu into the database
+            insert_menu_data(structured_menu_parsed)
 
             # Render the result, showing the structured menu
             return render(
