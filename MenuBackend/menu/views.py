@@ -52,7 +52,7 @@ def process_text(request):
         }
 
         # Call the FastAPI endpoint
-        response = requests.post("http://localhost:8001/process-menu", json=data)
+        response = requests.post("http://localhost:8001/process-menu", json=data, timeout=20)
 
         if response.status_code == 200:
             structured_menu = response.json().get("structured_menu")

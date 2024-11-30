@@ -4,13 +4,9 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import openai
 
-# Load environment variables
-load_dotenv()
-
-# Set OpenAI API key
+load_dotenv(dotenv_path="FastApiApp/.env")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Initialize FastAPI app
 app = FastAPI()
 
 
@@ -34,15 +30,12 @@ async def process_menu(input_data: TextInput):
     Returns:
         dict: The structured menu in JSON format.
     """
-    # Ensure API key is available
     if not openai.api_key:
         raise HTTPException(status_code=500, detail="OpenAI API key not found.")
 
-    # Validate input text
     if not input_data.text.strip():
         raise HTTPException(status_code=400, detail="Input text cannot be empty.")
 
-    # Generate a structured prompt for the model
     # Generate a structured prompt for the model
     prompt = (
         "You are an AI assistant that processes restaurant menu text. The text provided is extracted "
@@ -78,7 +71,6 @@ async def process_menu(input_data: TextInput):
     )
 
     try:
-        # Corrected API call using openai.chat.completions.create()
         response = openai.chat.completions.create(
             model=input_data.model,
             messages=[
@@ -89,12 +81,10 @@ async def process_menu(input_data: TextInput):
                 {"role": "user", "content": prompt},
             ],
             max_tokens=1000,
-            temperature=0.3,  # Keep responses deterministic for structured tasks
+            temperature=0.3,  
         )
 
-        # Correct access pattern to get the content of the message
         structured_menu = response.choices[0].message.content.strip()
-
         return {"structured_menu": structured_menu}
 
     except openai.OpenAIError as exc:
