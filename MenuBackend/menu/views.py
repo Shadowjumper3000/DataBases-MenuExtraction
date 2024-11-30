@@ -2,7 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
-from database_handler.models import Restaurant, MenuItem
+from database_handler.models import Restaurant, MenuItem, Menu
 from .utils import extract_text_from_pdf
 from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
@@ -75,21 +75,20 @@ def process_text(request):
 
 
 def home(request):
-    """
-    Home page view.
-    """
     db_connection_success = check_mysql_connection()
-    restaurants = Restaurant.objects.all().prefetch_related(
-        "menu_set__menusection_set__menuitem_set"
-    )
-    return render(
-        request,
-        "menu/home.html",
-        {
-            "db_connection_success": db_connection_success,
-            "restaurants": restaurants,
-        },
-    )
+    total_restaurants = Restaurant.objects.count()
+    total_menus = Menu.objects.count()
+    recent_restaurants = Restaurant.objects.order_by("-created_at")[
+        :5
+    ]  # Assuming you have a created_at field
+
+    context = {
+        "db_connection_success": db_connection_success,
+        "total_restaurants": total_restaurants,
+        "total_menus": total_menus,
+        "recent_restaurants": recent_restaurants,
+    }
+    return render(request, "menu/home.html", context)
 
 
 def restaurant_list(request):
