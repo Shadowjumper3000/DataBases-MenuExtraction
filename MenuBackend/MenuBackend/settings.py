@@ -94,7 +94,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "restaurants",  # Your database name
         "USER": "root",  # Your MySQL username
-        "PASSWORD": "rootpassword",  # Your MySQL password
+        "PASSWORD": "Ilinc@22",  # Your MySQL password
         "HOST": "localhost",  # Default to localhost
         "PORT": "3306",  # Default port for MySQL
     }
