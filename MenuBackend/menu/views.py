@@ -60,6 +60,9 @@ def process_text(request):
             # Ensure structured_menu is a proper Python object (JSON string needs parsing)
             structured_menu_parsed = json.loads(structured_menu)
 
+            # Insert the structured menu into the database
+            insert_menu_data(structured_menu_parsed)
+
             # Render the result, showing the structured menu
             return render(
                 request,
