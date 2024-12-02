@@ -15,21 +15,20 @@ def upload_pdf(request):
     """
     View to handle PDF file upload.
     Handles the POST request to upload a PDF file using the `PDFUploadForm`.
-    After uploading the file, the text content is extracted from the PDF and saved in the database.
+    After uploading the file, the text content is extracted from the PDF and processed.
     """
     if request.method == "POST":
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # Save the uploaded PDF to the database
-            pdf_file = form.instance  # Get the saved PDF file instance
+            pdf_file = request.FILES['file']  # Get the uploaded PDF file
             # Extract text from the uploaded PDF
-            extracted_text = extract_text_from_pdf(pdf_file.file.path)
+            extracted_text = extract_text_from_pdf(pdf_file)
 
             # Render a page to show the extracted text and confirm sending to AI
             return render(
                 request,
                 "menu/confirm_text.html",
-                {"extracted_text": extracted_text, "pdf_id": pdf_file.id},
+                {"extracted_text": extracted_text},
             )
     else:
         form = PDFUploadForm()
