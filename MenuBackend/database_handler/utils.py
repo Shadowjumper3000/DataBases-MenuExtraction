@@ -38,14 +38,9 @@ def insert_menu_data(menu_data):
 
     # Insert menu sections and items
     for section_data in menu_data["menus"]:
-        section, created = MenuSection.objects.get_or_create(
-            name=section_data["section"],
-            defaults={
-                "description": "",
-                "position": 0,  # Adjust as needed
-            },
-        )
-        print("Menu section created:", section)
+        section_name = section_data["section"]
+        section_description = section_data.get("description", "")
+        section_position = section_data.get("position", 0)
 
         for item_data in section_data["items"]:
             # Create or get the food item
@@ -57,6 +52,16 @@ def insert_menu_data(menu_data):
                 },
             )
             print("Food item created:", food_item)
+
+            # Create or get the menu section
+            section, created = MenuSection.objects.get_or_create(
+                name=section_name,
+                defaults={
+                    "description": section_description,
+                    "position": section_position,
+                },
+            )
+            print("Menu section created:", section)
 
             # Create the menu item linking the food item, menu, menu section, and price
             menu_item = MenuItem.objects.create(
@@ -72,10 +77,13 @@ def insert_menu_data(menu_data):
                 dietary_restriction, created = DietaryRestriction.objects.get_or_create(
                     name=restriction
                 )
-                FoodItemRestriction.objects.create(
-                    food_item=food_item, dietary_restriction=dietary_restriction
+                # Check if the FoodItemRestriction already exists before creating
+                food_item_restriction, created = (
+                    FoodItemRestriction.objects.get_or_create(
+                        food_item=food_item, dietary_restriction=dietary_restriction
+                    )
                 )
-                print("Dietary restriction created:", dietary_restriction)
+                print("Dietary restriction created or found:", dietary_restriction)
 
     # Log the processing action
     ProcessingLog.objects.create(
@@ -88,18 +96,24 @@ def insert_menu_data(menu_data):
 
 
 def create_database_if_not_exists():
-    db_settings = settings.DATABASES["default"]
-    db_name = db_settings["NAME"]
-    connection = MySQLdb.connect(
-        host=db_settings["HOST"],
-        user=db_settings["USER"],
-        passwd=db_settings["PASSWORD"],
-        port=int(db_settings["PORT"]),
-    )
-    cursor = connection.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
-    cursor.close()
-    connection.close()
+    try:
+        connection = MySQLdb.connect(
+            host=settings.DATABASES["default"]["HOST"],
+            user=settings.DATABASES["default"]["USER"],
+            passwd=settings.DATABASES["default"]["PASSWORD"],
+            port=int(settings.DATABASES["default"]["PORT"]),
+        )
+        cursor = connection.cursor()
+        cursor.execute(
+            f"CREATE DATABASE IF NOT EXISTS {settings.DATABASES['default']['NAME']}"
+        )
+        cursor.close()
+        connection.close()
+        print(
+            f"Database {settings.DATABASES['default']['NAME']} created or already exists."
+        )
+    except MySQLdb.Error as e:
+        print(f"Error creating database: {e}")
 
 
 def check_mysql_connection():

@@ -11,4 +11,9 @@ class DatabaseHandlerConfig(AppConfig):
 
         create_database_if_not_exists()
         # Run migrations to create tables
-        call_command("migrate", interactive=False)
+        try:
+            call_command("makemigrations", interactive=False)
+            call_command("migrate", interactive=False)
+        except Exception as e:
+            print(f"Error running migrations: {e}")
+            pass
