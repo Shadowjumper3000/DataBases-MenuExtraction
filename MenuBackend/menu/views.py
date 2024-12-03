@@ -44,25 +44,22 @@ def process_text(request):
     if request.method == "POST":
         extracted_text = request.POST.get("extracted_text")
 
-        # Prepare the data for the FastAPI endpoint
+        # Prepare the payload
         data = {
             "text": extracted_text,
-            "model": "gpt-4",  # Optional: specify the model if needed
+            "model": "gpt-4",
         }
 
-        # Call the FastAPI endpoint
+        # * Call to FastAPI endpoint
         response = requests.post("http://localhost:8001/process-menu", json=data)
 
         if response.status_code == 200:
             structured_menu = response.json().get("structured_menu")
 
-            # Ensure structured_menu is a proper Python object (JSON string needs parsing)
             structured_menu_parsed = json.loads(structured_menu)
 
-            # Insert the structured menu into the database
             insert_menu_data(structured_menu_parsed)
 
-            # Render the result, showing the structured menu
             return render(
                 request,
                 "menu/pdf_upload_success.html",
@@ -77,13 +74,21 @@ def process_text(request):
 
 
 def home(request):
+    """
+    View to display the home page.
+
+    Args:
+    - request: The HTTP request object.
+
+    Returns:
+    - Rendered HTML page with the home page.
+    """
     db_connection_success = check_mysql_connection()
     total_restaurants = Restaurant.objects.count()
     total_menus = Menu.objects.count()
     recent_restaurants = Restaurant.objects.order_by("-created_at")[
         :5
-    ]  # Assuming you have a created_at field
-
+    ]  
     context = {
         "db_connection_success": db_connection_success,
         "total_restaurants": total_restaurants,
