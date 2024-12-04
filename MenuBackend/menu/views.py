@@ -2,7 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
-from database_handler.models import Restaurant, MenuItem, Menu, ProcessingLog
+from database_handler.models import Restaurant, MenuItem, Menu, ProcessingLog, FoodItem
 from .utils import extract_text_from_pdf
 from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
@@ -20,7 +20,7 @@ def upload_pdf(request):
     if request.method == "POST":
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            pdf_file = request.FILES['file']
+            pdf_file = request.FILES["file"]
             # * calls extract_text_from_pdf to return plaintext
             extracted_text = extract_text_from_pdf(pdf_file)
 
@@ -150,53 +150,64 @@ def restaurant_detail(request, restaurant_id):
         {"restaurant": restaurant, "sections_json": json.dumps(sections)},
     )
 
+
 # * The report views
+
 
 def reports_home(request):
     """
     View to display the home page for reports.
     """
-    return render(request, 'menu/reports/reports_home.html')
+    return render(request, "menu/reports/reports_home.html")
+
 
 def menu_report(request):
     """
     View to generate a report on all menus.
     """
-    menus = Menu.objects.select_related('restaurant').all()
-    context = {'menus': menus}
-    return render(request, 'menu/reports/menu_report.html', context)
+    menus = Menu.objects.select_related("restaurant").all()
+    context = {"menus": menus}
+    return render(request, "menu/reports/menu_report.html", context)
+
 
 def menu_item_report(request):
     """
     View to generate a report on all menu items.
     """
-    menu_items = MenuItem.objects.select_related('menu', 'menu_section', 'food_item').all()
-    context = {'menu_items': menu_items}
-    return render(request, 'menu/reports/menu_item_report.html', context)
+    menu_items = MenuItem.objects.select_related(
+        "menu", "menu_section", "food_item"
+    ).all()
+    context = {"menu_items": menu_items}
+    return render(request, "menu/reports/menu_item_report.html", context)
+
 
 def food_item_restriction_report(request):
     """
     View to generate a report on food item restrictions.
     """
-    food_items = FoodItem.objects.prefetch_related('fooditemrestriction_set__dietary_restriction').all()
-    context = {'food_items': food_items}
-    return render(request, 'menu/reports/food_item_restriction_report.html', context)
+    food_items = FoodItem.objects.prefetch_related(
+        "fooditemrestriction_set__dietary_restriction"
+    ).all()
+    context = {"food_items": food_items}
+    return render(request, "menu/reports/food_item_restriction_report.html", context)
+
 
 def processing_log_report(request):
     """
     View to generate a report on menu processing logs.
     """
-    logs = ProcessingLog.objects.all().order_by('-action_time')
-    context = {'logs': logs}
-    return render(request, 'menu/reports/processing_log_report.html', context)
+    logs = ProcessingLog.objects.all().order_by("-action_time")
+    context = {"logs": logs}
+    return render(request, "menu/reports/processing_log_report.html", context)
+
 
 def active_menu_report(request):
     """
     View to generate a report on active menus.
     """
     active_menus = Menu.objects.filter(is_active=True)
-    context = {'active_menus': active_menus}
-    return render(request, 'menu/reports/active_menu_report.html', context)
+    context = {"active_menus": active_menus}
+    return render(request, "menu/reports/active_menu_report.html", context)
 
 
 # *! Deprecated
