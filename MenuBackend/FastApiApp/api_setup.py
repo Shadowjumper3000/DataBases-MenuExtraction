@@ -4,8 +4,11 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import openai
 
-load_dotenv(dotenv_path="FastApiApp/.env")
-openai.api_key = os.getenv("OPENAI_API_KEY")
+load_dotenv(dotenv_path='FastApiApp/.env')
+
+# Get the OpenAI API key from environment variables
+openai.api_key = os.getenv("OPEN_API_KEY")
+print(f"OpenAI API Key: {openai.api_key}")
 
 app = FastAPI()
 

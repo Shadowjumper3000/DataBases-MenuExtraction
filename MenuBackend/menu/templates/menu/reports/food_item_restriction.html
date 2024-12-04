@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Food Item Restriction Report{% endblock %}
+
+{% block content %}
+<h1>Food Item Restriction Report</h1>
+<table class="report-table">
+    <thead>
+        <tr>
+            <th>Food Item</th>
+            <th>Dietary Restrictions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for food_item in food_items %}
+        <tr>
+            <td>{{ food_item.name }}</td>
+            <td>
+                {% for restriction in food_item.fooditemrestriction_set.all %}
+                    {{ restriction.dietary_restriction.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

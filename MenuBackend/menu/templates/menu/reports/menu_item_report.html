@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu Item Report{% endblock %}
+
+{% block content %}
+<h1>Menu Item Report</h1>
+<table class="report-table">
+    <thead>
+        <tr>
+            <th>Menu</th>
+            <th>Section</th>
+            <th>Food Item</th>
+            <th>Description</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for menu_item in menu_items %}
+        <tr>
+            <td>{{ menu_item.menu.name }}</td>
+            <td>{{ menu_item.menu_section.name }}</td>
+            <td>{{ menu_item.food_item.name }}</td>
+            <td>{{ menu_item.food_item.description }}</td>
+            <td>{{ menu_item.price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

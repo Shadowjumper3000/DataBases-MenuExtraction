@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Processing Log Report{% endblock %}
+
+{% block content %}
+<h1>Processing Log Report</h1>
+<table class="report-table">
+    <thead>
+        <tr>
+            <th>Action Time</th>
+            <th>Menu</th>
+            <th>Action</th>
+            <th>Description</th>
+            <th>Performed By</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.action_time }}</td>
+            <td>{{ log.menu.name }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.description }}</td>
+            <td>{{ log.performed_by }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
