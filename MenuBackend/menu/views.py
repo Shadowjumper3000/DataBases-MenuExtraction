@@ -55,31 +55,31 @@ def upload_pdf(request):
 
 @csrf_exempt
 def process_text(request):
-    """
-    View to process the extracted text with the AI.
-    """
     if request.method == "POST":
         extracted_text = request.POST.get("extracted_text")
+        data = {"text": extracted_text, "model": "gpt-4"}
 
-        # Prepare the payload
-        data = {
-            "text": extracted_text,
-            "model": "gpt-4",
-        }
+        # Debug: Print the JSON data before sending it to the FastAPI endpoint
+        print("Sending JSON data to FastAPI endpoint:", json.dumps(data, indent=4))
 
-        # * Call to FastAPI endpoint
         response = requests.post(settings.FASTAPI_URL, json=data)
 
         if response.status_code == 200:
             structured_menu = response.json().get("structured_menu")
-            structured_menu_parsed = json.loads(structured_menu)
-            insert_menu_data(structured_menu_parsed)
-
-            return render(
-                request,
-                "menu/pdf_upload_success.html",
-                {"structured_menu": structured_menu_parsed},
-            )
+            print(
+                "Received structured menu:", structured_menu
+            )  # Debug: Print the received structured menu
+            try:
+                structured_menu_parsed = json.loads(structured_menu)
+                insert_menu_data(structured_menu_parsed)
+                return render(
+                    request,
+                    "menu/pdf_upload_success.html",
+                    {"structured_menu": structured_menu_parsed},
+                )
+            except json.JSONDecodeError as e:
+                print(f"JSONDecodeError: {e}")
+                return JsonResponse({"error": "Failed to decode JSON"}, status=500)
         else:
             return JsonResponse(
                 {"error": "Failed to process menu"}, status=response.status_code
@@ -88,12 +88,10 @@ def process_text(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-from collections import defaultdict
-
 def home(request):
     db_connection_success = check_mysql_connection()
     total_restaurants = Restaurant.objects.count()
-    total_menus = MenuItem.objects.count()
+    total_menus = Menu.objects.count()
     recent_restaurants = Restaurant.objects.order_by("-created_at")[:5]
 
     # Get dietary restrictions filter
@@ -124,13 +122,14 @@ def home(request):
         "total_menus": total_menus,
         "recent_restaurants": recent_restaurants,
         "filtered_items": filtered_items if not sort_by_restaurant else None,
-        "grouped_filtered_items": grouped_filtered_items if sort_by_restaurant else None,
+        "grouped_filtered_items": (
+            grouped_filtered_items if sort_by_restaurant else None
+        ),
         "dietary_restrictions": DietaryRestriction.objects.all(),
         "selected_restrictions": dietary_filter,
         "sort_by_restaurant": sort_by_restaurant,
     }
     return render(request, "menu/home.html", context)
-
 
 
 def restaurant_list(request):
@@ -222,25 +221,6 @@ def past_menus(request, restaurant_id):
             "restaurant": restaurant,
             "past_menus": past_menus,
         },
-    )
-
-    sections = defaultdict(list)
-    for item in menu_items:
-        sections[item.menu_section.name].append(
-            {
-                "food_item": item.food_item.name,
-                "price": float(item.price),
-                "description": item.food_item.description,
-                "dietary_restrictions": [
-                    restriction.dietary_restriction.name
-                    for restriction in item.food_item.fooditemrestriction_set.all()
-                ],
-            }
-        )
-    return render(
-        request,
-        "menu/restaurant_detail.html",
-        {"restaurant": restaurant, "sections_json": json.dumps(sections)},
     )
 
 
