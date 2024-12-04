@@ -183,18 +183,17 @@ def upload_json(request):
 
 
 def filter_menu_items(request):
-    # Get the dietary restriction filter from query parameters
-    dietary_filter = request.GET.get("dietary")  # e.g., 'vegan'
-
+    dietary_filter = request.GET.get("dietary") 
     if dietary_filter:
         filtered_items = FoodItemRestriction.objects.filter(
             dietary_restriction__name__iexact=dietary_filter
         ).select_related("food_item")
     else:
         filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
+    dietary_restrictions = DietaryRestriction.objects.all()
 
-    # Render the correct template depending on the request path
-    if request.path == '/':  # Home page
-        return render(request, "menu/home.html", {"filtered_items": filtered_items})
-    else:  # Dedicated page
-        return render(request, "menu/filtered_menu.html", {"filtered_items": filtered_items})
+    # Pass context to the template
+    return render(request, "menu/home.html", {
+        "filtered_items": filtered_items,
+        "dietary_restrictions": dietary_restrictions,
+    })
