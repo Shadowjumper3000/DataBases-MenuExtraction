@@ -17,6 +17,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+FASTAPI_URL = "http://127.0.0.1:8001/process-menu"
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -91,7 +94,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "restaurants",  # Your database name
         "USER": "root",  # Your MySQL username
-        "PASSWORD": "Espana2005",  # Your MySQL password
+        "PASSWORD": "rootpassword",  # Your MySQL password
         "HOST": "localhost",  # Default to localhost
         "PORT": "3306",  # Default port for MySQL
     }

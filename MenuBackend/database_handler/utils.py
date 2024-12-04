@@ -11,7 +11,6 @@ from .models import (
 from django.conf import settings
 import MySQLdb
 
-
 def insert_menu_data(menu_data):
     print("Inserting menu data:", menu_data)
 
@@ -28,13 +27,24 @@ def insert_menu_data(menu_data):
     )
     print("Restaurant created:", restaurant)
 
-    # Create a menu for the restaurant
+    # Determine the new version number
+    latest_menu = Menu.objects.filter(restaurant=restaurant).order_by('-version').first()
+    new_version_number = latest_menu.version + 1 if latest_menu else 1
+
+    # Create the new menu
     menu = Menu.objects.create(
         restaurant=restaurant,
         name="Default Menu",  # Adjust as needed
         description="Generated menu",
+        version=new_version_number,
+        is_active=True,
     )
     print("Menu created:", menu)
+
+    # Deactivate the previous active menu
+    if latest_menu:
+        latest_menu.is_active = False
+        latest_menu.save()
 
     # Insert menu sections and items
     for section_data in menu_data["menus"]:
@@ -42,47 +52,32 @@ def insert_menu_data(menu_data):
         section_description = section_data.get("description", "")
         section_position = section_data.get("position", 0)
 
+        menu_section = MenuSection.objects.create(
+            menu=menu,
+            name=section_name,
+            description=section_description,
+            position=section_position,
+        )
+        print("Menu section created:", menu_section)
+
         for item_data in section_data["items"]:
-            # Create or get the food item
             food_item, created = FoodItem.objects.get_or_create(
                 name=item_data["name"],
-                defaults={
-                    "description": item_data.get("description", ""),
-                    "is_available": True,  # Adjust as needed
-                },
+                defaults={"description": item_data.get("description", ""), "is_available": True},
             )
             print("Food item created:", food_item)
 
-            # Create or get the menu section
-            section, created = MenuSection.objects.get_or_create(
-                name=section_name,
-                defaults={
-                    "description": section_description,
-                    "position": section_position,
-                },
-            )
-            print("Menu section created:", section)
-
-            # Create the menu item linking the food item, menu, menu section, and price
-            menu_item = MenuItem.objects.create(
+            MenuItem.objects.create(
                 menu=menu,
-                menu_section=section,
+                menu_section=menu_section,
                 food_item=food_item,
-                price=item_data.get("price", 0.00),  # Set price here
+                price=item_data.get("price", 0.00),
             )
-            print("Menu item created:", menu_item)
+            print("Menu item created:", MenuItem)
 
-            # Insert dietary restrictions
             for restriction in item_data.get("dietary_restrictions", []):
-                dietary_restriction, created = DietaryRestriction.objects.get_or_create(
-                    name=restriction
-                )
-                # Check if the FoodItemRestriction already exists before creating
-                food_item_restriction, created = (
-                    FoodItemRestriction.objects.get_or_create(
-                        food_item=food_item, dietary_restriction=dietary_restriction
-                    )
-                )
+                dietary_restriction, created = DietaryRestriction.objects.get_or_create(name=restriction)
+                FoodItemRestriction.objects.get_or_create(food_item=food_item, dietary_restriction=dietary_restriction)
                 print("Dietary restriction created or found:", dietary_restriction)
 
     # Log the processing action
@@ -90,10 +85,9 @@ def insert_menu_data(menu_data):
         menu=menu,
         action="Insert",
         description="Inserted menu data from JSON",
-        performed_by="System",  # Adjust as needed
+        performed_by="System",
     )
     print("Processing log created for menu:", menu)
-
 
 def create_database_if_not_exists():
     try:
@@ -114,7 +108,6 @@ def create_database_if_not_exists():
         )
     except MySQLdb.Error as e:
         print(f"Error creating database: {e}")
-
 
 def check_mysql_connection():
     try:
