@@ -42,6 +42,8 @@ async def process_menu(input_data: TextInput):
         "from a PDF and may not have perfect formatting. Your job is to structure this text into a "
         "JSON format. Each section should be identified, and the menu items under each section should be listed. "
         "If no clear section is identified, create an 'Uncategorized' section and group items under it. "
+        "If an item has dietary restriction 'a', it should also include all related restrictions by default. "
+        "For example, if something is vegan, it is also vegetarian by default. "
         "Output the structured JSON format as shown below:\n\n"
         f"Extracted Text:\n{input_data.text}\n\n"
         "Output JSON format:\n"
@@ -69,7 +71,6 @@ async def process_menu(input_data: TextInput):
         "  ]\n"
         "}\n"
     )
-
     try:
         response = openai.chat.completions.create(
             model=input_data.model,
