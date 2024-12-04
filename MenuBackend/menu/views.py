@@ -20,7 +20,6 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 
-
 def get_filtered_items(dietary_filter):
     if dietary_filter:
         return FoodItemRestriction.objects.filter(
@@ -41,7 +40,6 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_file = request.FILES["file"]
             extracted_text = extract_text_from_pdf(pdf_file)
-
 
             # Render a page to show the extracted text and confirm sending to AI
             return render(
@@ -250,7 +248,7 @@ def filter_menu_items(request):
     )
 
 
-def filter_foods_by_restrictions(request):
+def filter_foods(request):
     selected_restrictions = request.GET.getlist("dietary")
     if selected_restrictions:
         filtered_items = FoodItemRestriction.objects.filter(
@@ -271,7 +269,6 @@ def filter_foods_by_restrictions(request):
             "selected_restrictions": selected_restrictions,
         },
     )
-
 
 
 def reports_home(request):
@@ -340,6 +337,7 @@ def menu_detail(request, menu_id):
 
 # *! Deprecated
 
+
 def filter_restrictions_by_food(request):
     selected_food = request.GET.get("food")
     if selected_food:
@@ -364,7 +362,6 @@ def filter_restrictions_by_food(request):
 
 
 @csrf_exempt
-
 def upload_json(request):
     """
     View to handle JSON data input.
@@ -390,6 +387,3 @@ def upload_json(request):
                 print(f"Error inserting JSON data into the database: {e}")
         return redirect("home")
     return render(request, "menu/upload_json.html")
-
-def reports_home(request):
-    return render(request, "menu/reports_home.html")

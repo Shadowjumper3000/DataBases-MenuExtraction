@@ -71,7 +71,6 @@
         border-radius: 8px;
         background-color: #fff;
         padding: 1rem;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .filtered-results ul {
@@ -130,23 +129,6 @@
             </ul>
         </div>
         {% endif %}
-
-        <!-- Filter by Dietary Restrictions -->
-        <div class="filter-section">
-            <h2>Filter by Dietary Restrictions</h2>
-            <form method="get" action="{% url 'filter_foods_by_restrictions' %}">
-                <label for="dietary">Select Restrictions:</label>
-                <select name="dietary" id="dietary" multiple>
-                    {% for restriction in dietary_restrictions %}
-                    <option value="{{ restriction.name }}"
-                            {% if restriction.name in selected_restrictions %}selected{% endif %}>
-                        {{ restriction.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Filter</button>
-            </form>
-        </div>
     </div>
 
     <!-- Main Content Section -->
@@ -163,22 +145,6 @@
         {% endfor %}
         {% else %}
         <p>No restaurants available.</p>
-        {% endif %}
-
-        <!-- Filtered Results -->
-        {% if filtered_items %}
-        <div class="filtered-results">
-            <h3>Filtered Food Items</h3>
-            <ul>
-                {% for item in filtered_items %}
-                <li>
-                    <strong>{{ item.food_item.name }}</strong><br>
-                    <span>{{ item.food_item.description }}</span><br>
-                    <em>Price:</em> ${{ item.food_item.price }}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
         {% endif %}
     </div>
 </div>
