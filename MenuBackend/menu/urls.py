@@ -14,4 +14,6 @@ urlpatterns = [
         views.restaurant_detail,
         name="restaurant_detail",
     ),  # Restaurant detail page
+    path("", views.filter_menu_items, name="home"), 
+    path("filter-menu/", views.filter_menu_items, name="filter_menu_items"),
 ]

@@ -8,6 +8,8 @@ from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from collections import defaultdict
+from django.shortcuts import render
+from database_handler.models import FoodItemRestriction, DietaryRestriction
 
 
 @csrf_exempt
@@ -178,3 +180,21 @@ def upload_json(request):
                 print(f"Error inserting JSON data into the database: {e}")
         return redirect("home")
     return render(request, "menu/upload_json.html")
+
+
+def filter_menu_items(request):
+    # Get the dietary restriction filter from query parameters
+    dietary_filter = request.GET.get("dietary")  # e.g., 'vegan'
+
+    if dietary_filter:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__iexact=dietary_filter
+        ).select_related("food_item")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
+
+    # Render the correct template depending on the request path
+    if request.path == '/':  # Home page
+        return render(request, "menu/home.html", {"filtered_items": filtered_items})
+    else:  # Dedicated page
+        return render(request, "menu/filtered_menu.html", {"filtered_items": filtered_items})
