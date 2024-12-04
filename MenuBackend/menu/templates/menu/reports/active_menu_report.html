@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Active Menu Report{% endblock %}
+
+{% block content %}
+<h1>Active Menu Report</h1>
+<table class="report-table">
+    <thead>
+        <tr>
+            <th>Restaurant</th>
+            <th>Menu Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for menu in active_menus %}
+        <tr>
+            <td>{{ menu.restaurant.name }}</td>
+            <td>{{ menu.name }}</td>
+            <td>{{ menu.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
