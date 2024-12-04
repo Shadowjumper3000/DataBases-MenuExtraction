@@ -2,8 +2,106 @@
 
 {% block title %}RestaurantManager{% endblock %}
 
+{% block extra_styles %}
+<style>
+    .main-content {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        gap: 2rem;
+    }
+
+    .sidebar {
+        width: 25%;
+        border: 1px solid #ccc;
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .restaurant-list {
+        width: 70%;
+    }
+
+    .restaurant-list h2 {
+        text-align: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .restaurant-card {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .restaurant-card a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    .restaurant-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .filters-container {
+        margin-top: 2rem;
+    }
+
+    .filter-section {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .filter-section h3 {
+        margin-bottom: 1rem;
+    }
+
+    .filtered-results {
+        margin-top: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+        padding: 1rem;
+    }
+
+    .filtered-results ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .filtered-results ul li {
+        padding: 1rem;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .filtered-results ul li:last-child {
+        border-bottom: none;
+    }
+
+    .filtered-results ul li strong {
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    .filtered-results ul li em {
+        font-size: 0.9rem;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="main-content">
+    <!-- Sidebar Section -->
     <div class="sidebar">
         {% if db_connection_success %}
         <div class="db-connection-success">
@@ -33,48 +131,23 @@
         {% endif %}
     </div>
 
-    <div class="restaurant-suggestions">
-        <h1>Top 3 Restaurant Suggestions</h1>
-        <div class="suggestion-boxes">
-            {% for restaurant in recent_restaurants|slice:":3" %}
-            <div class="suggestion-box">
+    
+
+    <!-- Main Content Section -->
+    <div class="restaurant-list">
+        <h2>Restaurants</h2>
+        {% if recent_restaurants %}
+        {% for restaurant in recent_restaurants %}
+        <div class="restaurant-card">
+            <a href="{% url 'restaurant_detail' restaurant.id %}">
                 <h3>{{ restaurant.name }}</h3>
                 <p>{{ restaurant.address }}</p>
-                <a href="{% url 'restaurant_detail' restaurant.id %}">View Menu</a>
-            </div>
-            {% endfor %}
+            </a>
         </div>
-    </div>
-
-    <!-- Filter by Dietary Restrictions -->
-    <div class="dietary-restrictions">
-        <h2>Filter by Dietary Restrictions</h2>
-        <form method="get" action="{% url 'filter_menu_items' %}">
-            <label for="dietary">Select Restriction:</label>
-            <select name="dietary" id="dietary">
-                <option value="">-- Select --</option>
-                {% for restriction in dietary_restrictions %}
-                <option value="{{ restriction.name }}">{{ restriction.name }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Filter</button>
-        </form>
-
-        <!-- Display Filtered Results -->
-        <div class="filtered-results">
-            <h3>Filtered Menu Items</h3>
-            <ul>
-                {% for restriction in filtered_items %}
-                <li>
-                    <strong>{{ restriction.food_item.name }}</strong><br>
-                    {{ restriction.food_item.description }}<br>
-                    Price: {{ restriction.food_item.price }}
-                </li>
-                {% empty %}
-                <p>No menu items match the selected restriction.</p>
-                {% endfor %}
-            </ul>
-        </div>
+        {% endfor %}
+        {% else %}
+        <p>No restaurants available.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

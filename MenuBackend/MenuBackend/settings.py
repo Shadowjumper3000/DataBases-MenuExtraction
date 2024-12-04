@@ -94,7 +94,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "restaurants",  # Your database name
         "USER": "root",  # Your MySQL username
-        "PASSWORD": "rootpassword",  # Your MySQL password
+        "PASSWORD": "Espana2005",  # Your MySQL password
         "HOST": "localhost",  # Default to localhost
         "PORT": "3306",  # Default port for MySQL
     }
@@ -141,3 +141,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+FASTAPI_URL = "http://127.0.0.1:8001/process-menu"

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Filter Food Items{% endblock %}
+
+{% block content %}
+<h1>Filter Food Items by Dietary Restrictions</h1>
+<form method="get" action="{% url 'filter_foods' %}">
+    <label for="dietary">Select Restrictions:</label>
+    <select name="dietary" id="dietary" multiple>
+        {% for restriction in dietary_restrictions %}
+        <option value="{{ restriction.name }}"
+                {% if restriction.name in selected_restrictions %}selected{% endif %}>
+            {{ restriction.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+<div class="filtered-results">
+    <h2>Filtered Food Items</h2>
+    {% if filtered_items %}
+    <ul>
+        {% for item in filtered_items %}
+        <li>
+            <strong>{{ item.food_item.name }}</strong><br>
+            {{ item.food_item.description }}<br>
+            Price: ${{ item.food_item.price }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No food items match the selected restrictions.</p>
+    {% endif %}
+</div>
+{% endblock %}
