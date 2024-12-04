@@ -1,10 +1,11 @@
-## (Team Name)
-# (Project Title)
+
+# Restaurant Management System
 ## Software Design Document
 
-Name:
+**Name**: [Group 9]  
+**Date**: [5/12/2024]  
 
-Date:
+---
 
 ## Summary
 
@@ -17,82 +18,135 @@ Date:
 - [7 Requirements Matrix](#7-requirements-matrix)
 - [8 Appendices](#8-appendices)
 
+---
+
 ## 1 Introduction
 
 ### 1.1 Purpose
-
-Identify the purpose of this SDD and its intended audience. 
+The purpose of this Software Design Document (SDD) is to provide a detailed description of the design and architecture of the Restaurant Management System. This document is intended for developers, designers, and stakeholders to ensure a clear understanding of the system's design, functionality, and implementation.
 
 ### 1.2 Scope
-
-Provide a description and scope of the software and explain the goals, objectives and benefits of your project.
+The Restaurant Management System is designed to manage restaurant operations, including menus, food items, dietary restrictions, and logging changes. The system supports multiple restaurants, shared menus, and detailed categorization of menu sections and food items. Key objectives include flexibility, scalability, and maintaining data integrity.
 
 ### 1.3 Overview
-
-Provide an overview of this document and its organization.
+This document details the system's architecture, data design, and components. It also describes the user interface design and requirements traceability.
 
 ### 1.4 Reference Material
-
-Optional. List any documents, if any, which were used as sources of information for the test plan. 
+1. Database Schema and Design Justification Report  
+2. Software Requirements Specification (SRS) Document
 
 ### 1.5 Definitions and Acronyms
+- **ERD**: Entity Relationship Diagram  
+- **SDD**: Software Design Document  
+- **SRS**: Software Requirements Specification  
 
-Optional. Provide definitions of all terms, acronyms, and abbreviations that might exist to properly interpret the SDD.
+---
 
 ## 2 System Overview
 
-Give a general description of the functionality, context and design of your project. Provide any background information if necessary. 
+The Restaurant Management System enables restaurant owners to manage their menus, food items, and dietary restrictions efficiently. It allows multiple restaurants to share menus and organize offerings into logical sections. The system includes support for auditing changes and ensuring scalability for multi-location operations.
+
+---
 
 ## 3 System Architecture
 
 ### 3.1 Architectural Design
+The system is designed using a modular architecture to separate key functions into subsystems. Major components include:
+- **Restaurant Subsystem**: Manages restaurant data such as names, addresses, and contact information.
+- **Menu Subsystem**: Handles menus, menu sections, and their assignments to restaurants.
+- **Food Item Subsystem**: Manages food items, their categorization, and dietary restrictions.
+- **Audit Subsystem**: Logs changes to menus for accountability.
 
-Develop a modular program structure and explain the relationships between the modules to achieve the complete functionality of the system. This is a high level overview of how responsibilities of the system were partitioned and then assigned to subsystems. Identify each high level subsystem and the roles or responsibilities assigned to it. Describe how these subsystems collaborate with each other in order to achieve the desired functionality. Don't go into too much detail about the individual subsystems. The main purpose is to gain a general understanding of how and why the system was decomposed, and how the individual parts work together. Provide a diagram showing the major subsystems and data repositories and their interconnections. Describe the diagram if required. 
+#### **Diagram**  
+- **Restaurant Subsystem** ↔ **Menu Subsystem** ↔ **Menu Section Subsystem** ↔ **Food Item Subsystem** ↔ **Dietary Restriction Subsystem**
 
 ### 3.2 Decomposition Description
+The system consists of:
+- **Data Layer**: Relational database schema including `restaurant`, `menu`, `menu_section`, `food_item`, and `dietary_restriction`.
+- **Business Logic Layer**: Includes modules for CRUD operations on menus, food items, and sections.
+- **User Interface Layer**: Provides a user-friendly interface for restaurant owners and staff.
 
-Provide a decomposition of the subsystems in the architectural design. Supplement with text as needed. You may choose to give a functional description or an objectoriented description. For a functional description, put toplevel data flow diagram (DFD) and structural decomposition diagrams. For an OO description, put subsystem model, object diagrams, generalization hierarchy diagram(s) (if any), aggregation hierarchy diagram(s) (if any), interface specifications, and sequence diagrams here. 
+### 3.3 Design Rationale
+This modular design ensures scalability, reusability, and maintainability. Other designs, such as using flat tables for menus and food items, were avoided due to poor scalability and potential data duplication.
 
-### 3.3 DEsign Rationale
-
-Discuss the rationale for selecting the architecture described in 3.1 including critical issues and trade/offs that were considered. You may discuss other architectures that were considered, provided that you explain why you didn't choose them. 
+---
 
 ## 4 Data Design
 
 ### 4.1 Data Description
-
-Explain how the information domain of your system is transformed into data structures. Describe how the major data or system entities are stored, processed and organized. List any databases or data storage items. 
+The database schema is highly normalized:
+- **Key Tables**: `restaurant`, `menu`, `menu_section`, `food_item`, `dietary_restriction`
+- **Junction Tables**: `restaurant_menu`, `food_item_restriction`
 
 ### 4.2 Data Dictionary
+| **Entity**              | **Attributes**                                                                 |
+|--------------------------|-------------------------------------------------------------------------------|
+| `restaurant`             | `id`, `name`, `address`, `phone_number`, `email`, `website`, `created_at`, `updated_at` |
+| `menu`                   | `id`, `name`, `description`, `is_active`, `created_at`, `updated_at`         |
+| `menu_section`           | `id`, `name`, `description`, `position`, `created_at`, `updated_at`          |
+| `food_item`              | `id`, `name`, `description`, `price`, `is_available`, `image_url`, `created_at`, `updated_at` |
+| `dietary_restriction`    | `id`, `name`, `description`                                                  |
+| `restaurant_menu`        | `restaurant_id`, `menu_id`                                                   |
+| `food_item_restriction`  | `food_item_id`, `dietary_restriction_id`                                      |
+| `processing_log`         | `id`, `menu_id`, `action`, `description`, `action_time`, `performed_by`      |
 
-Alphabetically list the system entities or major data along with their types and descriptions. If you provided a functional description in Section 3.2, list all the functions and function parameters. If you provided an OO description, list the objects and its attributes, methods and method parameters. 
+---
 
 ## 5 Component Design
 
-In this section, we take a closer look at what each component does in a more systematic way. If you gave a functional description in section 3.2, provide a summary of your algorithm for each function listed in 3.2 in procedural description language (PDL) or pseudocode. If you gave an OO description, summarize each object member function for all the objects listed in 3.2 in PDL or pseudocode. Describe any local data when necessary. 
+| **Component**             | **Description**                                                                                             |
+|---------------------------|-------------------------------------------------------------------------------------------------------------|
+| `RestaurantManager`       | Manages CRUD operations for `restaurant` entities.                                                         |
+| `MenuManager`             | Handles creation, modification, and deletion of menus, including their associations with restaurants.       |
+| `FoodItemManager`         | Manages food items, including their assignments to menus and menu sections.                                 |
+| `AuditManager`            | Tracks changes to menus via `processing_log`.                                                              |
+| `DietaryRestrictionManager` | Handles operations related to dietary restrictions and their assignments to food items.                     |
+
+---
 
 ## 6 Human Interface Design
 
 ### 6.1 Overview of User Interface
-
-Describe the functionality of the system from the user's perspective. Explain how the user will be able to use your system to complete all the expected features and the feedback information that will be displayed for the user. 
+The system provides an intuitive dashboard for restaurant owners to:
+- Create and manage menus.
+- Assign menus to multiple restaurants.
+- Categorize menus into sections and add food items.
 
 ### 6.2 Screen Images
-
-Display screenshots showing the interface from the user's perspective. These can be hand drawn or you can use an automated drawing tool. Just make them as accurate as possible. (Graph paper works well.) 
+Screens include:
+1. **Dashboard**: Overview of restaurants and their menus.
+2. **Menu Editor**: Create and edit menus, sections, and food items.
+3. **Logs**: View actions performed on menus (e.g., updates or deletions).
 
 ### 6.3 Screen Objects and Actions
+- **Button: "Add Menu"**: Opens a form to create a new menu.
+- **Dropdown: "Select Restaurant"**: Associates a menu with multiple restaurants.
+- **Table: "Menu Sections"**: Displays and organizes menu sections dynamically.
 
-A discussion of screen objects and actions associated with those objects. 
+---
 
 ## 7 Requirements Matrix
 
-Provide a crossreference that traces components and data structures to the requirements in your SRS document.
+| **Requirement ID** | **Description**                                           | **Component**                   |
+|--------------------|-----------------------------------------------------------|---------------------------------|
+| R1                 | Create and manage restaurants                             | `RestaurantManager`            |
+| R2                 | Manage many-to-many relationship between menus and restaurants | `MenuManager`                  |
+| R3                 | Manage food items and assign them to menus and sections   | `FoodItemManager`              |
+| R4                 | Track menu changes for auditing purposes                  | `AuditManager`                 |
+| R5                 | Handle dietary restrictions for food items                | `DietaryRestrictionManager`    |
 
-Use a tabular format to show which system components satisfy each of the functional requirements from the SRS. Refer to the functional requirements by the numbers/codes that you gave them in the SRS.
+---
 
 ## 8 Appendices
 
-Optional. Appendices may be included, either directly or by reference, to provide supporting details that could aid in the understanding of the Software Design Document.
+### **Appendix A: Entity Relationship Diagram (ERD)**
+![ERD Diagram](image.png)
 
-Based on [Software Design Document (SDD) Template ](https://devlegalsimpli.blob.core.windows.net/pdfseoforms/pdf-20180219t134432z-001/pdf/software-design-document-2.pdf)
+
+### **Appendix B: Acronyms**
+- CRUD: Create, Read, Update, Delete  
+- SRS: Software Requirements Specification  
+- ERD: Entity Relationship Diagram  
+
+---
+
