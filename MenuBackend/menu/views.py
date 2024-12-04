@@ -90,33 +90,49 @@ def process_text(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
+from collections import defaultdict
+
 def home(request):
-    """
-    View to display the home page.
-
-    Args:
-    - request: The HTTP request object.
-
-    Returns:
-    - Rendered HTML page with the home page.
-    """
     db_connection_success = check_mysql_connection()
     total_restaurants = Restaurant.objects.count()
-    total_menus = Menu.objects.count()
+    total_menus = MenuItem.objects.count()
     recent_restaurants = Restaurant.objects.order_by("-created_at")[:5]
-    dietary_filter = request.GET.get("dietary")
-    filtered_items = get_filtered_items(dietary_filter)
-    dietary_restrictions = DietaryRestriction.objects.all()
+
+    # Get dietary restrictions filter
+    dietary_filter = request.GET.getlist("dietary")
+
+    # Get sort_by_restaurant parameter
+    sort_by_restaurant = request.GET.get("sort_by_restaurant") == "true"
+
+    # Filter food items by dietary restrictions
+    filtered_items = (
+        FoodItemRestriction.objects.filter(
+            dietary_restriction__name__in=dietary_filter
+        ).select_related("food_item", "food_item__menuitem__menu__restaurant")
+        if dietary_filter
+        else None
+    )
+
+    # Group filtered food items by restaurant if sorting is requested
+    grouped_filtered_items = defaultdict(list)
+    if filtered_items and sort_by_restaurant:
+        for item in filtered_items:
+            restaurant = item.food_item.menuitem.menu.restaurant
+            grouped_filtered_items[restaurant].append(item.food_item)
 
     context = {
         "db_connection_success": db_connection_success,
         "total_restaurants": total_restaurants,
         "total_menus": total_menus,
         "recent_restaurants": recent_restaurants,
-        "filtered_items": filtered_items,
-        "dietary_restrictions": dietary_restrictions,
+        "filtered_items": filtered_items if not sort_by_restaurant else None,
+        "grouped_filtered_items": grouped_filtered_items if sort_by_restaurant else None,
+        "dietary_restrictions": DietaryRestriction.objects.all(),
+        "selected_restrictions": dietary_filter,
+        "sort_by_restaurant": sort_by_restaurant,
     }
     return render(request, "menu/home.html", context)
+
 
 
 def restaurant_list(request):
