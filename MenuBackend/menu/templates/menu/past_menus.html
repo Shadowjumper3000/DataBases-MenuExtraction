@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ restaurant.name }} - Past Menus{% endblock %}
+
+{% block content %}
+<h1>{{ restaurant.name }}</h1>
+<p>{{ restaurant.address }}</p>
+<p>{{ restaurant.phone_number }}</p>
+<p>{{ restaurant.email }}</p>
+<p>{{ restaurant.website }}</p>
+
+<h2>Past Menus</h2>
+{% if past_menus %}
+    <ul>
+        {% for menu in past_menus %}
+            <li>
+                <strong>Version {{ menu.version }}</strong> - {{ menu.name }}<br>
+                {{ menu.description }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No past menus available.</p>
+{% endif %}
+
+<a href="{% url 'restaurant_detail' restaurant.id %}">Back to Active Menu</a>
+{% endblock %}

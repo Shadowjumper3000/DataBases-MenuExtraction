@@ -14,8 +14,10 @@ urlpatterns = [
         views.restaurant_detail,
         name="restaurant_detail",
     ),  # Restaurant detail page
-    path("reports/", views.reports_home, name="reports_home"),  # Reports home page
-    path("reports/menus/", views.menu_report, name="menu_report"),  # Menu report
+    path("reports/", views.reports_home, name="reports_home"),
+    # Reports home page
+    path("reports/menus/", views.menu_report, name="menu_report"),
+    # Menu report
     path(
         "reports/menu-items/", views.menu_item_report, name="menu_item_report"
     ),  # Menu item report
@@ -32,4 +34,10 @@ urlpatterns = [
     path(
         "reports/active-menus/", views.active_menu_report, name="active_menu_report"
     ),  # Active menu report
+    path("menu/<int:menu_id>/", views.menu_detail, name="menu_detail"),  # menu_detail
+    path(
+        "restaurants/<int:restaurant_id>/past-menus/",
+        views.past_menus,
+        name="past_menus",
+    ),
 ]
