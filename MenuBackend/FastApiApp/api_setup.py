@@ -6,12 +6,8 @@ import openai
 
 load_dotenv(dotenv_path='FastApiApp/.env')
 
-# Get the OpenAI API key from environment variables
-openai.api_key = os.getenv("OPENAI_API_KEY")
-print(f"OpenAI API Key: {openai.api_key}")
-
+openai.api_key = os.getenv("OPEN_API_KEY")
 app = FastAPI()
-
 
 class TextInput(BaseModel):
     """
