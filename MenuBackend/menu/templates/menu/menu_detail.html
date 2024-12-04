@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu Detail{% endblock %}
+
+{% block content %}
+<h1>{{ menu.name }}</h1>
+<p>{{ menu.description }}</p>
+<h2>Versions</h2>
+<ul>
+    {% for version in versions %}
+    <li>
+        Version {{ version.version }} - {{ version.is_active|yesno:"Active,Inactive" }}
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'update_menu' menu.id %}">Update Menu</a>
+{% endblock %}
