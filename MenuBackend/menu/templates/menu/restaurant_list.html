@@ -3,17 +3,33 @@
 {% block title %}Restaurant List{% endblock %}
 
 {% block content %}
-
 <div class="restaurant-list">
     <h1>Restaurants</h1>
     <div class="suggestion-boxes">
-        {% for restaurant in restaurants %}
+        {% for restaurant in page_obj %}
         <div class="suggestion-box">
             <h3>{{ restaurant.name }}</h3>
             <p>{{ restaurant.address }}</p>
             <a href="{% url 'restaurant_detail' restaurant.id %}">View Menu</a>
         </div>
         {% endfor %}
+    </div>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
     </div>
 </div>
 {% endblock %}
