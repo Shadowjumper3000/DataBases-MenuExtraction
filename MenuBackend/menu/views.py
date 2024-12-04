@@ -2,7 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
-from database_handler.models import Restaurant, MenuItem, Menu, ProcessingLog
+from database_handler.models import Restaurant, MenuItem, Menu, FoodItem, ProcessingLog
 from .utils import extract_text_from_pdf
 from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
@@ -180,7 +180,7 @@ def food_item_restriction_report(request):
     """
     food_items = FoodItem.objects.prefetch_related('fooditemrestriction_set__dietary_restriction').all()
     context = {'food_items': food_items}
-    return render(request, 'menu/reports/food_item_restriction_report.html', context)
+    return render(request, 'menu/reports/food_item_restriction.html', context)
 
 def processing_log_report(request):
     """
