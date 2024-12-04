@@ -39,7 +39,6 @@ def upload_pdf(request):
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_file = request.FILES["file"]
-            # * calls extract_text_from_pdf to return plaintext
             extracted_text = extract_text_from_pdf(pdf_file)
 
             # Render a page to show the extracted text and confirm sending to AI
@@ -56,31 +55,31 @@ def upload_pdf(request):
 
 @csrf_exempt
 def process_text(request):
-    """
-    View to process the extracted text with the AI.
-    """
     if request.method == "POST":
         extracted_text = request.POST.get("extracted_text")
+        data = {"text": extracted_text, "model": "gpt-4"}
 
-        # Prepare the payload
-        data = {
-            "text": extracted_text,
-            "model": "gpt-4",
-        }
+        # Debug: Print the JSON data before sending it to the FastAPI endpoint
+        print("Sending JSON data to FastAPI endpoint:", json.dumps(data, indent=4))
 
-        # * Call to FastAPI endpoint
         response = requests.post(settings.FASTAPI_URL, json=data)
 
         if response.status_code == 200:
             structured_menu = response.json().get("structured_menu")
-            structured_menu_parsed = json.loads(structured_menu)
-            insert_menu_data(structured_menu_parsed)
-
-            return render(
-                request,
-                "menu/pdf_upload_success.html",
-                {"structured_menu": structured_menu_parsed},
-            )
+            print(
+                "Received structured menu:", structured_menu
+            )  # Debug: Print the received structured menu
+            try:
+                structured_menu_parsed = json.loads(structured_menu)
+                insert_menu_data(structured_menu_parsed)
+                return render(
+                    request,
+                    "menu/pdf_upload_success.html",
+                    {"structured_menu": structured_menu_parsed},
+                )
+            except json.JSONDecodeError as e:
+                print(f"JSONDecodeError: {e}")
+                return JsonResponse({"error": "Failed to decode JSON"}, status=500)
         else:
             return JsonResponse(
                 {"error": "Failed to process menu"}, status=response.status_code
@@ -90,30 +89,45 @@ def process_text(request):
 
 
 def home(request):
-    """
-    View to display the home page.
-
-    Args:
-    - request: The HTTP request object.
-
-    Returns:
-    - Rendered HTML page with the home page.
-    """
     db_connection_success = check_mysql_connection()
     total_restaurants = Restaurant.objects.count()
     total_menus = Menu.objects.count()
     recent_restaurants = Restaurant.objects.order_by("-created_at")[:5]
-    dietary_filter = request.GET.get("dietary")
-    filtered_items = get_filtered_items(dietary_filter)
-    dietary_restrictions = DietaryRestriction.objects.all()
+
+    # Get dietary restrictions filter
+    dietary_filter = request.GET.getlist("dietary")
+
+    # Get sort_by_restaurant parameter
+    sort_by_restaurant = request.GET.get("sort_by_restaurant") == "true"
+
+    # Filter food items by dietary restrictions
+    filtered_items = (
+        FoodItemRestriction.objects.filter(
+            dietary_restriction__name__in=dietary_filter
+        ).select_related("food_item", "food_item__menuitem__menu__restaurant")
+        if dietary_filter
+        else None
+    )
+
+    # Group filtered food items by restaurant if sorting is requested
+    grouped_filtered_items = defaultdict(list)
+    if filtered_items and sort_by_restaurant:
+        for item in filtered_items:
+            restaurant = item.food_item.menuitem.menu.restaurant
+            grouped_filtered_items[restaurant].append(item.food_item)
 
     context = {
         "db_connection_success": db_connection_success,
         "total_restaurants": total_restaurants,
         "total_menus": total_menus,
         "recent_restaurants": recent_restaurants,
-        "filtered_items": filtered_items,
-        "dietary_restrictions": dietary_restrictions,
+        "filtered_items": filtered_items if not sort_by_restaurant else None,
+        "grouped_filtered_items": (
+            grouped_filtered_items if sort_by_restaurant else None
+        ),
+        "dietary_restrictions": DietaryRestriction.objects.all(),
+        "selected_restrictions": dietary_filter,
+        "sort_by_restaurant": sort_by_restaurant,
     }
     return render(request, "menu/home.html", context)
 
@@ -212,8 +226,14 @@ def past_menus(request, restaurant_id):
 
 def filter_menu_items(request):
     dietary_filter = request.GET.get("dietary")
-    filtered_items = get_filtered_items(dietary_filter)
+    if dietary_filter:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__iexact=dietary_filter
+        ).select_related("food_item")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
     dietary_restrictions = DietaryRestriction.objects.all()
+
     return render(
         request,
         "menu/filtered_menu.html",
@@ -224,7 +244,27 @@ def filter_menu_items(request):
     )
 
 
-# * The report views
+def filter_foods(request):
+    selected_restrictions = request.GET.getlist("dietary")
+    if selected_restrictions:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__in=selected_restrictions
+        ).select_related("food_item", "dietary_restriction")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    dietary_restrictions = DietaryRestriction.objects.all()
+
+    return render(
+        request,
+        "menu/filter_foods.html",
+        {
+            "filtered_items": filtered_items,
+            "dietary_restrictions": dietary_restrictions,
+            "selected_restrictions": selected_restrictions,
+        },
+    )
 
 
 def reports_home(request):
@@ -292,6 +332,32 @@ def menu_detail(request, menu_id):
 
 
 # *! Deprecated
+
+
+def filter_restrictions_by_food(request):
+    selected_food = request.GET.get("food")
+    if selected_food:
+        filtered_restrictions = FoodItemRestriction.objects.filter(
+            food_item__name__iexact=selected_food
+        ).select_related("dietary_restriction")
+    else:
+        filtered_restrictions = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    food_items = FoodItem.objects.all()
+
+    return render(
+        request,
+        "menu/filter_restrictions.html",
+        {
+            "filtered_restrictions": filtered_restrictions,
+            "food_items": food_items,
+            "selected_food": selected_food,
+        },
+    )
+
+
+@csrf_exempt
 def upload_json(request):
     """
     View to handle JSON data input.
