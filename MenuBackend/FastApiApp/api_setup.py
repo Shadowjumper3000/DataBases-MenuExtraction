@@ -44,6 +44,7 @@ async def process_menu(input_data: TextInput):
         "If no clear section is identified, create an 'Uncategorized' section and group items under it. "
         "If an item has dietary restriction 'a', it should also include all related restrictions by default. "
         "For example, if something is vegan, it is also vegetarian by default. "
+        "Validate the JSON structure to ensure it is complete and well-formed. "
         "Output the structured JSON format as shown below:\n\n"
         f"Extracted Text:\n{input_data.text}\n\n"
         "Output JSON format:\n"
@@ -81,7 +82,7 @@ async def process_menu(input_data: TextInput):
                 },
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=5000,
+            max_tokens=6000,
             temperature=0.3,
         )
 
