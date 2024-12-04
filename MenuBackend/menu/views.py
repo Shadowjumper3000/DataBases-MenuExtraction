@@ -283,17 +283,6 @@ def menu_report(request):
     return render(request, "menu/reports/menu_report.html", context)
 
 
-def menu_item_report(request):
-    """
-    View to generate a report on all menu items.
-    """
-    menu_items = MenuItem.objects.select_related(
-        "menu", "menu_section", "food_item"
-    ).all()
-    context = {"menu_items": menu_items}
-    return render(request, "menu/reports/menu_item_report.html", context)
-
-
 def food_item_restriction_report(request):
     """
     View to generate a report on food item restrictions.
