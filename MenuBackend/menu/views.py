@@ -97,29 +97,77 @@ def restaurant_list(request):
 
 
 def restaurant_detail(request, restaurant_id):
+    """
+    View to display the details of a specific restaurant's menu, including past menus.
+
+    Args:
+    - request: The HTTP request object.
+    - restaurant_id: The ID of the restaurant to display.
+
+    Returns:
+    - Rendered HTML page with the restaurant's menu details.
+    """
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-    menu_items = (
-        MenuItem.objects.filter(menu__restaurant=restaurant)
-        .select_related("menu", "menu_section", "food_item")
-        .prefetch_related("food_item__fooditemrestriction_set__dietary_restriction")
-    )
-    sections = defaultdict(list)
-    for item in menu_items:
-        sections[item.menu_section.name].append(
-            {
-                "food_item": item.food_item.name,
-                "price": float(item.price),
-                "description": item.food_item.description,
-                "dietary_restrictions": [
-                    restriction.dietary_restriction.name
-                    for restriction in item.food_item.fooditemrestriction_set.all()
-                ],
-            }
+
+    # Get the active menu
+    active_menu = Menu.objects.filter(restaurant=restaurant, is_active=True).first()
+
+    # Get menu items for the active menu
+    if active_menu:
+        menu_items = (
+            MenuItem.objects.filter(menu=active_menu)
+            .select_related("menu", "menu_section", "food_item")
+            .prefetch_related("food_item__fooditemrestriction_set__dietary_restriction")
         )
+        sections = defaultdict(list)
+        for item in menu_items:
+            sections[item.menu_section.name].append(
+                {
+                    "food_item": item.food_item.name,
+                    "price": float(item.price),
+                    "description": item.food_item.description,
+                    "dietary_restrictions": [
+                        restriction.dietary_restriction.name
+                        for restriction in item.food_item.fooditemrestriction_set.all()
+                    ],
+                }
+            )
+    else:
+        sections = {}
+
     return render(
         request,
         "menu/restaurant_detail.html",
-        {"restaurant": restaurant, "sections_json": json.dumps(sections)},
+        {
+            "restaurant": restaurant,
+            "active_menu": active_menu,
+            "sections_json": json.dumps(sections),
+        },
+    )
+
+
+def past_menus(request, restaurant_id):
+    """
+    View to display the past menus of a specific restaurant.
+
+    Args:
+    - request: The HTTP request object.
+    - restaurant_id: The ID of the restaurant to display.
+
+    Returns:
+    - Rendered HTML page with the restaurant's past menus.
+    """
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    past_menus = Menu.objects.filter(restaurant=restaurant, is_active=False).order_by(
+        "-version"
+    )
+    return render(
+        request,
+        "menu/past_menus.html",
+        {
+            "restaurant": restaurant,
+            "past_menus": past_menus,
+        },
     )
 
 
@@ -175,7 +223,7 @@ def food_item_restriction_report(request):
         "fooditemrestriction_set__dietary_restriction"
     ).all()
     context = {"food_items": food_items}
-    return render(request, "menu/reports/food_item_restriction_report.html", context)
+    return render(request, "menu/reports/food_item_restriction.html", context)
 
 
 def processing_log_report(request):
@@ -194,6 +242,13 @@ def active_menu_report(request):
     active_menus = Menu.objects.filter(is_active=True)
     context = {"active_menus": active_menus}
     return render(request, "menu/reports/active_menu_report.html", context)
+
+def menu_detail(request, menu_id):
+    menu = get_object_or_404(Menu, id=menu_id)
+    versions = Menu.objects.filter(restaurant=menu.restaurant).order_by("-version")
+    return render(
+        request, "menu/menu_detail.html", {"menu": menu, "versions": versions}
+    )
 
 
 # *! Deprecated
