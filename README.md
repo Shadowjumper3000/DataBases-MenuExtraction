@@ -56,10 +56,12 @@
 ### 5. Apply the migrations:
 - For Windows
     ```sh
+    python manage.py makemigrations database_handler
     python manage.py migrate
     ```
 - For Linux/macOS
     ```sh
+    python3 manage.py makemigrations database_handler
     python3 manage.py migrate
     ```
 
@@ -73,7 +75,14 @@
     python3 manage.py createsuperuser
     ```
 
-### 7. Run the Django and the FastAPI servers:
+### 7. Set the OpenAI API key:
+- Create a `.env` file in the FastApiApp directory of the project.
+- Add the following line to the `.env` file:
+    ```sh
+    OPENAI_API_KEY=<your_api_key>
+    ```
+
+### 8. Run the Django and the FastAPI servers:
 - For Windows
     ```sh
     python run_servers.py
@@ -82,7 +91,7 @@
     ```sh
     python3 run_servers.py
     ```
-### 8. Access the application:
+### 9. Access the application:
 - Open your web browser and go to `http://127.0.0.1:8000/` for the Django application.
 - The FastAPI server will be running on `http://127.0.0.1:8001/`.
 
