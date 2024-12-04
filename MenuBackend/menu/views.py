@@ -2,7 +2,15 @@ import json
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PDFUploadForm
-from database_handler.models import Restaurant, MenuItem, Menu, ProcessingLog, FoodItem, FoodItemRestriction, DietaryRestriction
+from database_handler.models import (
+    Restaurant,
+    MenuItem,
+    Menu,
+    ProcessingLog,
+    FoodItem,
+    FoodItemRestriction,
+    DietaryRestriction,
+)
 from .utils import extract_text_from_pdf
 from database_handler.utils import check_mysql_connection, insert_menu_data
 from django.http import JsonResponse
@@ -10,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from collections import defaultdict
 from django.conf import settings
+
 
 def get_filtered_items(dietary_filter):
     if dietary_filter:
@@ -25,9 +34,10 @@ def upload_pdf(request):
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_file = request.FILES["file"]
-            # * calls extract_text_from_pdf to return plaintext
             extracted_text = extract_text_from_pdf(pdf_file)
-            return render(request, "menu/confirm_text.html", {"extracted_text": extracted_text})
+            return render(
+                request, "menu/confirm_text.html", {"extracted_text": extracted_text}
+            )
     else:
         form = PDFUploadForm()
     return render(request, "menu/upload_pdf.html", {"form": form})
@@ -44,9 +54,15 @@ def process_text(request):
             structured_menu = response.json().get("structured_menu")
             structured_menu_parsed = json.loads(structured_menu)
             insert_menu_data(structured_menu_parsed)
-            return render(request, "menu/pdf_upload_success.html", {"structured_menu": structured_menu_parsed})
+            return render(
+                request,
+                "menu/pdf_upload_success.html",
+                {"structured_menu": structured_menu_parsed},
+            )
         else:
-            return JsonResponse({"error": "Failed to process menu"}, status=response.status_code)
+            return JsonResponse(
+                {"error": "Failed to process menu"}, status=response.status_code
+            )
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
@@ -70,10 +86,11 @@ def home(request):
     }
     return render(request, "menu/home.html", context)
 
+
 def restaurant_list(request):
     restaurants = Restaurant.objects.all()
     paginator = Paginator(restaurants, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     return render(request, "menu/restaurant_list.html", {"page_obj": page_obj})
 
@@ -87,16 +104,22 @@ def restaurant_detail(request, restaurant_id):
     )
     sections = defaultdict(list)
     for item in menu_items:
-        sections[item.menu_section.name].append({
-            "food_item": item.food_item.name,
-            "price": float(item.price),
-            "description": item.food_item.description,
-            "dietary_restrictions": [
-                restriction.dietary_restriction.name
-                for restriction in item.food_item.fooditemrestriction_set.all()
-            ],
-        })
-    return render(request, "menu/restaurant_detail.html", {"restaurant": restaurant, "sections_json": json.dumps(sections)})
+        sections[item.menu_section.name].append(
+            {
+                "food_item": item.food_item.name,
+                "price": float(item.price),
+                "description": item.food_item.description,
+                "dietary_restrictions": [
+                    restriction.dietary_restriction.name
+                    for restriction in item.food_item.fooditemrestriction_set.all()
+                ],
+            }
+        )
+    return render(
+        request,
+        "menu/restaurant_detail.html",
+        {"restaurant": restaurant, "sections_json": json.dumps(sections)},
+    )
 
 
 def filter_menu_items(request):
@@ -107,75 +130,65 @@ def filter_menu_items(request):
         ).select_related("food_item")
     else:
         filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
-    dietary_restrictions = DietaryRestriction.objects.all()  # Fetch all restrictions
+    dietary_restrictions = DietaryRestriction.objects.all()
 
-    return render(request, "menu/filtered_menu.html", {
-        "filtered_items": filtered_items,
-        "dietary_restrictions": dietary_restrictions,
-    })
-
-
-
-# * The report views
-
-
-def reports_home(request):
-    """
-    View to display the home page for reports.
-    """
-    return render(request, "menu/reports/reports_home.html")
+    return render(
+        request,
+        "menu/filtered_menu.html",
+        {
+            "filtered_items": filtered_items,
+            "dietary_restrictions": dietary_restrictions,
+        },
+    )
 
 
-def menu_report(request):
-    """
-    View to generate a report on all menus.
-    """
-    menus = Menu.objects.select_related("restaurant").all()
-    context = {"menus": menus}
-    return render(request, "menu/reports/menu_report.html", context)
+def filter_foods_by_restrictions(request):
+    selected_restrictions = request.GET.getlist("dietary")
+    if selected_restrictions:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__in=selected_restrictions
+        ).select_related("food_item", "dietary_restriction")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    dietary_restrictions = DietaryRestriction.objects.all()
+
+    return render(
+        request,
+        "menu/filter_foods.html",
+        {
+            "filtered_items": filtered_items,
+            "dietary_restrictions": dietary_restrictions,
+            "selected_restrictions": selected_restrictions,
+        },
+    )
 
 
-def menu_item_report(request):
-    """
-    View to generate a report on all menu items.
-    """
-    menu_items = MenuItem.objects.select_related(
-        "menu", "menu_section", "food_item"
-    ).all()
-    context = {"menu_items": menu_items}
-    return render(request, "menu/reports/menu_item_report.html", context)
+def filter_restrictions_by_food(request):
+    selected_food = request.GET.get("food")
+    if selected_food:
+        filtered_restrictions = FoodItemRestriction.objects.filter(
+            food_item__name__iexact=selected_food
+        ).select_related("dietary_restriction")
+    else:
+        filtered_restrictions = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    food_items = FoodItem.objects.all()
+
+    return render(
+        request,
+        "menu/filter_restrictions.html",
+        {
+            "filtered_restrictions": filtered_restrictions,
+            "food_items": food_items,
+            "selected_food": selected_food,
+        },
+    )
 
 
-def food_item_restriction_report(request):
-    """
-    View to generate a report on food item restrictions.
-    """
-    food_items = FoodItem.objects.prefetch_related(
-        "fooditemrestriction_set__dietary_restriction"
-    ).all()
-    context = {"food_items": food_items}
-    return render(request, "menu/reports/food_item_restriction_report.html", context)
-
-
-def processing_log_report(request):
-    """
-    View to generate a report on menu processing logs.
-    """
-    logs = ProcessingLog.objects.all().order_by("-action_time")
-    context = {"logs": logs}
-    return render(request, "menu/reports/processing_log_report.html", context)
-
-
-def active_menu_report(request):
-    """
-    View to generate a report on active menus.
-    """
-    active_menus = Menu.objects.filter(is_active=True)
-    context = {"active_menus": active_menus}
-    return render(request, "menu/reports/active_menu_report.html", context)
-
-
-# *! Deprecated
+@csrf_exempt
 def upload_json(request):
     if request.method == "POST":
         json_data = request.POST.get("json_data")
@@ -183,9 +196,13 @@ def upload_json(request):
             try:
                 menu_data = json.loads(json_data)
                 insert_menu_data(menu_data)
+                print("JSON data successfully inserted into the database.")
             except json.JSONDecodeError as e:
                 print(f"Invalid JSON data: {e}")
             except Exception as e:
                 print(f"Error inserting JSON data: {e}")
         return redirect("home")
     return render(request, "menu/upload_json.html")
+
+def reports_home(request):
+    return render(request, "menu/reports_home.html")
