@@ -12,6 +12,7 @@ from django.conf import settings
 import MySQLdb
 import json
 
+
 def insert_menu_data(menu_data):
     print("Inserting menu data:", menu_data)
 
@@ -29,7 +30,9 @@ def insert_menu_data(menu_data):
     print("Restaurant created:", restaurant)
 
     # Determine the new version number
-    latest_menu = Menu.objects.filter(restaurant=restaurant).order_by('-version').first()
+    latest_menu = (
+        Menu.objects.filter(restaurant=restaurant).order_by("-version").first()
+    )
     new_version_number = latest_menu.version + 1 if latest_menu else 1
 
     # Serialize the latest menu data to compare with the new menu data
@@ -50,12 +53,14 @@ def insert_menu_data(menu_data):
                 }
                 for item in items
             ]
-            sections_data.append({
-                "section": section.name,
-                "description": section.description,
-                "position": section.position,
-                "items": items_data,
-            })
+            sections_data.append(
+                {
+                    "section": section.name,
+                    "description": section.description,
+                    "position": section.position,
+                    "items": items_data,
+                }
+            )
         return {
             "restaurant": {
                 "name": menu.restaurant.name,
@@ -70,7 +75,9 @@ def insert_menu_data(menu_data):
     # Check if the new menu data is the same as the latest menu data
     if latest_menu:
         latest_menu_data = serialize_menu(latest_menu)
-        if json.dumps(latest_menu_data, sort_keys=True) == json.dumps(menu_data, sort_keys=True):
+        if json.dumps(latest_menu_data, sort_keys=True) == json.dumps(
+            menu_data, sort_keys=True
+        ):
             # Log the new version without creating duplicates
             ProcessingLog.objects.create(
                 menu=latest_menu,
@@ -78,7 +85,10 @@ def insert_menu_data(menu_data):
                 description=f"Version {new_version_number} logged without changes",
                 performed_by="System",
             )
-            print(f"Version {new_version_number} logged without changes for menu:", latest_menu)
+            print(
+                f"Version {new_version_number} logged without changes for menu:",
+                latest_menu,
+            )
             return
 
     # Create the new menu
@@ -113,7 +123,10 @@ def insert_menu_data(menu_data):
         for item_data in section_data["items"]:
             food_item, created = FoodItem.objects.get_or_create(
                 name=item_data["name"],
-                defaults={"description": item_data.get("description", ""), "is_available": True},
+                defaults={
+                    "description": item_data.get("description", ""),
+                    "is_available": True,
+                },
             )
             print("Food item created:", food_item)
 
@@ -126,8 +139,12 @@ def insert_menu_data(menu_data):
             print("Menu item created:", MenuItem)
 
             for restriction in item_data.get("dietary_restrictions", []):
-                dietary_restriction, created = DietaryRestriction.objects.get_or_create(name=restriction)
-                FoodItemRestriction.objects.get_or_create(food_item=food_item, dietary_restriction=dietary_restriction)
+                dietary_restriction, created = DietaryRestriction.objects.get_or_create(
+                    name=restriction
+                )
+                FoodItemRestriction.objects.get_or_create(
+                    food_item=food_item, dietary_restriction=dietary_restriction
+                )
                 print("Dietary restriction created or found:", dietary_restriction)
 
     # Log the processing action
@@ -138,6 +155,7 @@ def insert_menu_data(menu_data):
         performed_by="System",
     )
     print("Processing log created for menu:", menu)
+
 
 def create_database_if_not_exists():
     try:
@@ -158,6 +176,7 @@ def create_database_if_not_exists():
         )
     except MySQLdb.Error as e:
         print(f"Error creating database: {e}")
+
 
 def check_mysql_connection():
     try:
