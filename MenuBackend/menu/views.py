@@ -20,6 +20,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 
+
 def get_filtered_items(dietary_filter):
     if dietary_filter:
         return FoodItemRestriction.objects.filter(
@@ -39,8 +40,8 @@ def upload_pdf(request):
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_file = request.FILES["file"]
-            # * calls extract_text_from_pdf to return plaintext
             extracted_text = extract_text_from_pdf(pdf_file)
+
 
             # Render a page to show the extracted text and confirm sending to AI
             return render(
@@ -209,11 +210,36 @@ def past_menus(request, restaurant_id):
         },
     )
 
+    sections = defaultdict(list)
+    for item in menu_items:
+        sections[item.menu_section.name].append(
+            {
+                "food_item": item.food_item.name,
+                "price": float(item.price),
+                "description": item.food_item.description,
+                "dietary_restrictions": [
+                    restriction.dietary_restriction.name
+                    for restriction in item.food_item.fooditemrestriction_set.all()
+                ],
+            }
+        )
+    return render(
+        request,
+        "menu/restaurant_detail.html",
+        {"restaurant": restaurant, "sections_json": json.dumps(sections)},
+    )
+
 
 def filter_menu_items(request):
     dietary_filter = request.GET.get("dietary")
-    filtered_items = get_filtered_items(dietary_filter)
+    if dietary_filter:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__iexact=dietary_filter
+        ).select_related("food_item")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
     dietary_restrictions = DietaryRestriction.objects.all()
+
     return render(
         request,
         "menu/filtered_menu.html",
@@ -224,7 +250,28 @@ def filter_menu_items(request):
     )
 
 
-# * The report views
+def filter_foods_by_restrictions(request):
+    selected_restrictions = request.GET.getlist("dietary")
+    if selected_restrictions:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__in=selected_restrictions
+        ).select_related("food_item", "dietary_restriction")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    dietary_restrictions = DietaryRestriction.objects.all()
+
+    return render(
+        request,
+        "menu/filter_foods.html",
+        {
+            "filtered_items": filtered_items,
+            "dietary_restrictions": dietary_restrictions,
+            "selected_restrictions": selected_restrictions,
+        },
+    )
+
 
 
 def reports_home(request):
@@ -292,6 +339,32 @@ def menu_detail(request, menu_id):
 
 
 # *! Deprecated
+
+def filter_restrictions_by_food(request):
+    selected_food = request.GET.get("food")
+    if selected_food:
+        filtered_restrictions = FoodItemRestriction.objects.filter(
+            food_item__name__iexact=selected_food
+        ).select_related("dietary_restriction")
+    else:
+        filtered_restrictions = FoodItemRestriction.objects.all().select_related(
+            "food_item", "dietary_restriction"
+        )
+    food_items = FoodItem.objects.all()
+
+    return render(
+        request,
+        "menu/filter_restrictions.html",
+        {
+            "filtered_restrictions": filtered_restrictions,
+            "food_items": food_items,
+            "selected_food": selected_food,
+        },
+    )
+
+
+@csrf_exempt
+
 def upload_json(request):
     """
     View to handle JSON data input.
@@ -317,3 +390,6 @@ def upload_json(request):
                 print(f"Error inserting JSON data into the database: {e}")
         return redirect("home")
     return render(request, "menu/upload_json.html")
+
+def reports_home(request):
+    return render(request, "menu/reports_home.html")

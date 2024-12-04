@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+
     path("process-text/", views.process_text, name="process_text"),  # Process text
     path("", views.home, name="home"),  # Home page
     path("upload-pdf/", views.upload_pdf, name="upload_pdf"),  # PDF upload page
@@ -23,4 +24,11 @@ urlpatterns = [
         views.past_menus,
         name="past_menus",
     ),
+
+   
+    path("filter-foods/", views.filter_foods_by_restrictions, name="filter_foods_by_restrictions"),
+    path("filter-restrictions/", views.filter_restrictions_by_food, name="filter_restrictions_by_food"),
+    path("reports/", views.reports_home, name="reports_home"),
+
+
 ]
