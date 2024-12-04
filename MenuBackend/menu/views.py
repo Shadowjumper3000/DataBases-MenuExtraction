@@ -101,12 +101,19 @@ def restaurant_detail(request, restaurant_id):
 
 def filter_menu_items(request):
     dietary_filter = request.GET.get("dietary")
-    filtered_items = get_filtered_items(dietary_filter)
-    dietary_restrictions = DietaryRestriction.objects.all()
+    if dietary_filter:
+        filtered_items = FoodItemRestriction.objects.filter(
+            dietary_restriction__name__iexact=dietary_filter
+        ).select_related("food_item")
+    else:
+        filtered_items = FoodItemRestriction.objects.all().select_related("food_item")
+    dietary_restrictions = DietaryRestriction.objects.all()  # Fetch all restrictions
+
     return render(request, "menu/filtered_menu.html", {
         "filtered_items": filtered_items,
         "dietary_restrictions": dietary_restrictions,
     })
+
 
 
 # * The report views
