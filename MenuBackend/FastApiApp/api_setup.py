@@ -4,10 +4,11 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import openai
 
-load_dotenv(dotenv_path='FastApiApp/.env')
+load_dotenv(dotenv_path="FastApiApp/.env")
 
 openai.api_key = os.getenv("OPEN_API_KEY")
 app = FastAPI()
+
 
 class TextInput(BaseModel):
     """
@@ -80,7 +81,7 @@ async def process_menu(input_data: TextInput):
                 {"role": "user", "content": prompt},
             ],
             max_tokens=1000,
-            temperature=0.3,  
+            temperature=0.3,
         )
 
         structured_menu = response.choices[0].message.content.strip()
