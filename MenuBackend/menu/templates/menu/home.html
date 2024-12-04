@@ -45,5 +45,36 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Filter by Dietary Restrictions -->
+    <div class="dietary-restrictions">
+        <h2>Filter by Dietary Restrictions</h2>
+        <form method="get" action="{% url 'filter_menu_items' %}">
+            <label for="dietary">Select Restriction:</label>
+            <select name="dietary" id="dietary">
+                <option value="">-- Select --</option>
+                {% for restriction in dietary_restrictions %}
+                <option value="{{ restriction.name }}">{{ restriction.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+
+        <!-- Display Filtered Results -->
+        <div class="filtered-results">
+            <h3>Filtered Menu Items</h3>
+            <ul>
+                {% for restriction in filtered_items %}
+                <li>
+                    <strong>{{ restriction.food_item.name }}</strong><br>
+                    {{ restriction.food_item.description }}<br>
+                    Price: {{ restriction.food_item.price }}
+                </li>
+                {% empty %}
+                <p>No menu items match the selected restriction.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 {% endblock %}
