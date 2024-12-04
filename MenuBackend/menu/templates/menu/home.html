@@ -132,12 +132,11 @@
     </div>
 
     
-
     <!-- Main Content Section -->
     <div class="restaurant-list">
-        <h2>Restaurants</h2>
+        <h2>Try these Restaurants</h2>
         {% if recent_restaurants %}
-        {% for restaurant in recent_restaurants %}
+        {% for restaurant in recent_restaurants|slice:":3" %}
         <div class="restaurant-card">
             <a href="{% url 'restaurant_detail' restaurant.id %}">
                 <h3>{{ restaurant.name }}</h3>
