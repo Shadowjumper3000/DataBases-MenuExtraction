@@ -169,3 +169,23 @@ Screens include:
 - ERD: Entity Relationship Diagram  
 
 ---
+
+# Index Strategy
+
+## Primary Indexes
+- Restaurant table: id (Primary Key)
+- Menu table: id (Primary Key)
+- MenuItem table: Composite index (menu_id, menu_section_id)
+
+## Secondary Indexes
+- Restaurant table: name, email
+- Menu table: restaurant_id, is_active
+- FoodItem table: name
+- DietaryRestriction table: name
+
+## Justification
+- Improves query performance for menu filtering
+- Optimizes restaurant search operations
+- Enhances dietary restriction lookups
+
+---

@@ -114,7 +114,7 @@
 
 ### **Handle Menu Updates**
 
-- Supports versioning and historical tracking of menu changes.
+- Supports versioning and historical tracking of menus.
 
 ---
 
@@ -122,9 +122,7 @@
 
 ### **Dynamic Filtering**
 
-- Sidebar filters for:
-  - Dietary restrictions.
-  - Restaurant-specific food items.
+- Dietary restrictions.
 - Results dynamically update without disrupting the layout.
 
 ### **Navigation**
@@ -132,5 +130,6 @@
 - Clean navigation bar with links to:
   - Home
   - Restaurants
+  - Dietary (Filtering)
   - Upload Menu
   - Reports
