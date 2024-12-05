@@ -71,7 +71,6 @@ This document outlines the key challenges encountered during the development and
   - Handling large PDFs and high API traffic could strain resources.
   - Database performance needed to scale with increasing data volume.
 - **Solution:**
-  - Deployed the system using containerized environments (e.g., Docker) for scalability.
   - Configured database optimizations and implemented pagination for large result sets.
 
 ---
