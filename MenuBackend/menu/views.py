@@ -71,6 +71,9 @@ def process_text(request):
             )  # Debug: Print the received structured menu
             try:
                 structured_menu_parsed = json.loads(structured_menu)
+                print(
+                    "Parsed structured menu:", structured_menu_parsed
+                )  # Debug: Print the parsed structured menu
                 insert_menu_data(structured_menu_parsed)
                 return render(
                     request,
@@ -79,8 +82,33 @@ def process_text(request):
                 )
             except json.JSONDecodeError as e:
                 print(f"JSONDecodeError: {e}")
-                return JsonResponse({"error": "Failed to decode JSON"}, status=500)
+                print(
+                    f"Structured menu content: {structured_menu}"
+                )  # Debug: Print the structured menu content
+                ProcessingLog.objects.create(
+                    menu=None,
+                    action="Error",
+                    description=f"Failed to decode JSON: {e}",
+                    performed_by="System",
+                )
+                return render(
+                    request,
+                    "menu/pdf_upload_failure.html",
+                    {"error": "Failed to decode JSON. Please try again."},
+                )
+            except KeyError as e:
+                print(f"KeyError: {e}")
+                ProcessingLog.objects.create(
+                    menu=None,
+                    action="Error",
+                    description=f"Missing key: {e}",
+                    performed_by="System",
+                )
+                return JsonResponse({"error": f"Missing key: {e}"}, status=500)
         else:
+            print(
+                f"Failed to process menu: {response.text}"
+            )  # Debug: Print the response text
             return JsonResponse(
                 {"error": "Failed to process menu"}, status=response.status_code
             )
