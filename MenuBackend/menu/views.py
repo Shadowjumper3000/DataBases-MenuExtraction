@@ -204,11 +204,10 @@ def past_menus(request, restaurant_id):
     View to display the past menus of a specific restaurant.
     """
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-    past_menus = Menu.objects.filter(
-        restaurant=restaurant, 
-        is_active=False
-    ).order_by("-version")
-    
+    past_menus = Menu.objects.filter(restaurant=restaurant, is_active=False).order_by(
+        "-version"
+    )
+
     # Get menu items for each past menu
     menu_details = {}
     for menu in past_menus:
@@ -297,7 +296,11 @@ def menu_report(request):
     """
     View to generate a report on all menus.
     """
-    menus = Menu.objects.select_related("restaurant").all().order_by("restaurant__name", "-version")
+    menus = (
+        Menu.objects.select_related("restaurant")
+        .all()
+        .order_by("restaurant__name", "-version")
+    )
     context = {"menus": menus}
     return render(request, "menu/reports/menu_report.html", context)
 
@@ -326,7 +329,11 @@ def active_menu_report(request):
     """
     View to generate a report on active menus.
     """
-    active_menus = Menu.objects.filter(is_active=True).select_related("restaurant").order_by("restaurant__name")
+    active_menus = (
+        Menu.objects.filter(is_active=True)
+        .select_related("restaurant")
+        .order_by("restaurant__name")
+    )
     context = {"active_menus": active_menus}
     return render(request, "menu/reports/active_menu_report.html", context)
 
@@ -337,6 +344,7 @@ def menu_detail(request, menu_id):
     return render(
         request, "menu/menu_detail.html", {"menu": menu, "versions": versions}
     )
+
 
 def filter_restrictions_by_food(request):
     selected_food = request.GET.get("food")
