@@ -55,6 +55,7 @@ async def process_menu(input_data: TextInput):
         "If an item has dietary restriction 'a', it should also include all related restrictions by default. "
         "For example, if something is vegan, it is also vegetarian by default. "
         "Validate the JSON structure to ensure it is complete and well-formed. "
+        "If the provided text does not appear to be a menu return an error. "
         "Output the structured JSON format as shown below:\n\n"
         f"Extracted Text:\n{input_data.text}\n\n"
         "Output JSON format:\n"
