@@ -55,6 +55,7 @@ def upload_pdf(request):
 
 @csrf_exempt
 def process_text(request):
+    '''View to process the extracted text from the PDF and send it to the FastAPI endpoint.'''
     if request.method == "POST":
         extracted_text = request.POST.get("extracted_text")
         data = {"text": extracted_text, "model": "gpt-4"}
@@ -117,6 +118,7 @@ def process_text(request):
 
 
 def home(request):
+    """Display home page with restaurant stats and filtered menu items."""
     db_connection_success = check_mysql_connection()
     total_restaurants = Restaurant.objects.count()
     total_menus = Menu.objects.count()
@@ -162,13 +164,13 @@ def home(request):
 
 def restaurant_list(request):
     """
-    View to display the list of restaurants.
+    Display paginated list of all restaurants.
 
     Args:
-    - request: The HTTP request object.
+        request: HTTP request object
 
     Returns:
-    - Rendered HTML page with the list of restaurants.
+        Rendered restaurant list template with paginated restaurant data
     """
     restaurants = Restaurant.objects.all()
     paginator = Paginator(restaurants, 10)
@@ -271,6 +273,7 @@ def past_menus(request, restaurant_id):
 
 
 def filter_menu_items(request):
+    '''Filters menu items based on dietary restrictions.'''
     dietary_filter = request.GET.get("dietary")
     if dietary_filter:
         filtered_items = FoodItemRestriction.objects.filter(
@@ -291,6 +294,7 @@ def filter_menu_items(request):
 
 
 def filter_foods(request):
+    """Filter and display food items based on dietary restrictions."""
     selected_restrictions = request.GET.getlist("dietary")
     if selected_restrictions:
         filtered_items = FoodItemRestriction.objects.filter(
@@ -314,9 +318,7 @@ def filter_foods(request):
 
 
 def reports_home(request):
-    """
-    View to display the home page for reports.
-    """
+    """Display reports dashboard."""
     return render(request, "menu/reports/reports_home.html")
 
 
@@ -367,11 +369,19 @@ def active_menu_report(request):
 
 
 def menu_detail(request, menu_id):
+    """
+    Display details of a specific menu.
+
+    Args:
+        request: HTTP request object
+        menu_id: ID of the menu to display
+
+    Returns:
+        Rendered menu detail template with menu and version information
+    """
     menu = get_object_or_404(Menu, id=menu_id)
     versions = Menu.objects.filter(restaurant=menu.restaurant).order_by("-version")
-    return render(
-        request, "menu/menu_detail.html", {"menu": menu, "versions": versions}
-    )
+    return render(request, "menu/menu_detail.html", {"menu": menu, "versions": versions})
 
 
 def filter_restrictions_by_food(request):

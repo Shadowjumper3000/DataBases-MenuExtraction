@@ -15,6 +15,15 @@ from decimal import Decimal, InvalidOperation
 
 
 def insert_menu_data(menu_data):
+    """
+    Insert structured menu data into database.
+
+    Args:
+        menu_data (dict): Structured menu data containing restaurant and menu information
+
+    Returns:
+        None
+    """
     print("Inserting menu data:", menu_data)
 
     # Insert restaurant data
@@ -131,6 +140,12 @@ def create_database_if_not_exists():
 
 
 def check_mysql_connection():
+    """
+    Check if MySQL database connection is working.
+
+    Returns:
+        bool: True if connection successful, False otherwise
+    """
     try:
         connection = MySQLdb.connect(
             host=settings.DATABASES["default"]["HOST"],
