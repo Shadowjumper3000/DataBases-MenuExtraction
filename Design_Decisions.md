@@ -1,98 +1,131 @@
-# **Design Decisions**
+# **Restaurant Menu Database Project**
 
-This document outlines the key design decisions made during the development of the restaurant menu extraction and filtering system. These decisions were made to ensure scalability, usability, and maintainability of the system while leveraging Django and external APIs.
-
----
-
-## **1. Technology Stack**
-### **Backend Framework: Django**
-- **Reasoning:** 
-  - Django provides a robust ORM for managing relational databases.
-  - Built-in features like authentication, admin panel, and form handling simplified development.
-  - Its modular structure aligns well with the separation of concerns between the API, database models, and frontend.
-- **Alternatives Considered:** Flask or FastAPI were considered but lacked the comprehensive "batteries-included" nature of Django.
-
-### **Database: MySQL**
-- **Reasoning:**
-  - MySQL was chosen for its reliability, scalability, and extensive community support.
-  - Compatibility with Django's ORM and the ability to perform complex SQL queries when needed.
-- **Alternatives Considered:** PostgreSQL for advanced data types but decided on MySQL due to familiarity and performance.
-
-### **API Integration: OpenAI**
-- **Reasoning:**
-  - OpenAI's GPT-4 is capable of parsing unstructured text into structured JSON, which aligns perfectly with the goal of extracting and organizing menu data.
-  - The API supports natural language processing, making it an ideal choice for working with complex, imperfectly formatted menu texts.
+## **Building an AI-Powered Menu Management System**
 
 ---
 
-## **2. System Architecture**
-### **Layered Approach**
-The system follows a layered architecture to separate concerns:
-1. **Frontend (Templates):**
-   - Uses Django's templating engine to render dynamic pages.
-   - Includes filters and structured UI for user interaction.
-2. **Backend (Views & Models):**
-   - Handles data fetching, filtering logic, and business rules.
-   - Integrates with APIs and communicates with the database.
-3. **Database:**
-   - Stores normalized data including restaurants, menus, food items, dietary restrictions, and relationships between them.
-
-### **RESTful API Integration**
-- **Design Choice:** The system integrates a FastAPI service for menu text processing. Django sends raw text extracted from uploaded files to the API, which returns structured JSON.
-- **Why FastAPI?**
-  - Asynchronous capabilities for faster response times.
-  - Lightweight and easy to integrate with Django.
+## **Project Overview**
+Create a database system that processes restaurant menu PDFs using AI (Claude or ChatGPT) and stores the structured data. This project demonstrates the integration of database design, ETL processes, and AI-powered text processing.
 
 ---
 
-## **3. Key Features and Decisions**
-### **Menu Parsing with GPT-4 API**
-- **Decision:** Use OpenAI's GPT-4 for parsing unstructured menu text into structured JSON.
-- **Why?**
-  - Handling diverse formats of menus that may vary in structure and quality.
-  - Reduces the manual effort required to process menu data.
-  
-### **Filtering by Dietary Restrictions**
-- **Decision:** Allow users to filter menu items based on dietary restrictions.
-- **Why?**
-  - Enhances usability for specific user needs like vegetarian, gluten-free, etc.
-  - Achieved through a join table `FoodItemRestriction` that maps food items to dietary restrictions.
-
-### **Filtering by Restaurant**
-- **Decision:** Enable filtering food items by restaurant and grouping results accordingly.
-- **Why?**
-  - Helps users locate items from specific restaurants.
-  - Improves the scalability of the system by allowing restaurant-level queries.
+## **Learning Objectives**
+- Design and implement a normalized database schema.
+- Create an ETL pipeline to extract, transform, and load menu data.
+- Integrate with AI APIs to process unstructured text.
+- Implement robust data validation mechanisms.
+- Write and optimize SQL queries for data retrieval and analysis.
+- Document database design decisions in detail.
 
 ---
 
-## **4. Data Schema Design**
-### **Normalization**
-- The database schema is normalized to avoid redundancy and ensure maintainability.
-- Key tables:
-  - **Restaurant:** Stores details about each restaurant.
-  - **Menu:** Stores menus linked to restaurants.
-  - **MenuItem:** Links food items to specific menus.
-  - **FoodItemRestriction:** A many-to-many relationship table for dietary restrictions.
-  - **DietaryRestriction:** Defines dietary categories.
+## **Design Decisions**
 
-### **Relationships**
+### **1. Technology Stack**
+#### **Backend Framework: Django**
+- **Why Django?**
+  - Robust ORM simplifies database management and querying.
+  - Includes built-in tools for authentication, admin panel, and form handling.
+  - Promotes modularity, allowing clear separation of API, database, and frontend.
+
+#### **Database: MySQL**
+- **Why MySQL?**
+  - Reliable, scalable, and widely supported.
+  - Efficient performance for complex queries and large datasets.
+  - Seamless integration with Django ORM.
+
+#### **AI Integration: OpenAI**
+- **Why GPT-4?**
+  - Handles diverse and unstructured menu formats with high accuracy.
+  - Produces structured JSON output for seamless database insertion.
+
+---
+
+### **2. System Architecture**
+#### **Layered Approach**
+- **Frontend:** Django templates dynamically render pages and provide filters.
+- **Backend:** Handles database operations, API integration, and user interactions.
+- **Database:** Stores structured menu data, dietary restrictions, and relationships.
+
+#### **RESTful API Integration**
+- **FastAPI:** Processes text from PDFs and integrates with GPT-4.
+  - **Why FastAPI?**
+    - Lightweight and asynchronous, ensuring faster processing.
+    - Handles JSON conversion for unstructured text efficiently.
+
+---
+
+### **3. Database Design**
+#### **Normalization**
+- Designed in **3NF** to reduce redundancy and improve maintainability.
+- Key tables include:
+  - **Restaurant:** Stores restaurant metadata.
+  - **Menu:** Links to restaurants and contains menu metadata.
+  - **MenuSection:** Categorizes menu items (e.g., appetizers, entrees).
+  - **MenuItem:** Stores individual food items and pricing.
+  - **DietaryRestriction:** Lists dietary categories like vegan, gluten-free.
+  - **FoodItemRestriction:** Manages many-to-many relationships between items and restrictions.
+  - **ProcessingLog:** Tracks the status and errors in the ETL pipeline.
+
+#### **Relationships**
 - **Restaurant ↔ Menu:** One-to-Many.
-- **Menu ↔ MenuItem:** One-to-Many.
+- **Menu ↔ MenuSection ↔ MenuItem:** One-to-Many.
 - **MenuItem ↔ FoodItemRestriction ↔ DietaryRestriction:** Many-to-Many.
 
+#### **Index Strategy**
+- Indexed fields for:
+  - **Restaurant names**: Frequent searches.
+  - **Menu item names**: Filtering and sorting.
+  - **Dietary restrictions**: Optimized query performance.
+
 ---
 
-## **5. User Interface Design**
-### **Dynamic Filtering**
-- **Decision:** Include filters for dietary restrictions and restaurants.
-- **Implementation:**
-  - Sidebar for filtering criteria.
-  - Results dynamically update without affecting other components of the page.
-  - Ensured filters do not clutter the UI and remain accessible.
+### **4. ETL Process**
+#### **PDF Text Extraction**
+- Extracts raw text using libraries like `PyPDF2` or `pdfplumber`.
+- Handles unstructured data with varying formats.
 
-### **Navigation**
-- **Decision:** Use a clean navigation bar with links to:
+#### **AI Integration**
+- Sends extracted text to GPT-4 via FastAPI.
+- Converts unstructured text into structured JSON.
+
+#### **Data Validation**
+- Ensures completeness and correctness before database insertion:
+  - Validates field values (e.g., numerical prices).
+  - Checks for missing or duplicate entries.
+
+#### **Error Handling and Logging**
+- **ProcessingLog** table tracks ETL pipeline activities and errors.
+
+---
+
+### **5. Query Design**
+#### **Retrieve Menu Information**
+- Fetches complete menu details, including items, sections, and dietary restrictions.
+
+#### **Filter Items by Dietary Restrictions**
+- Joins `FoodItemRestriction` and `DietaryRestriction` to fetch matching menu items.
+
+#### **Track Processing Status**
+- Queries `ProcessingLog` for status updates and error details.
+
+#### **Generate Reports**
+- Summarizes menu prices, item counts, and restaurant activity.
+
+#### **Handle Menu Updates**
+- Supports versioning and historical tracking of menu changes.
+
+---
+
+### **6. User Interface Design**
+#### **Dynamic Filtering**
+- Sidebar filters for:
+  - Dietary restrictions.
+  - Restaurant-specific food items.
+- Results dynamically update without disrupting the layout.
+
+#### **Navigation**
+- Clean navigation bar with links to:
   - Home
   - Restaurants
   - Upload Menu
