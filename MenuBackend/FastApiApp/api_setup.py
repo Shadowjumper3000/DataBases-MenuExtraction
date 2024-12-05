@@ -1,4 +1,5 @@
 import os
+import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -8,6 +9,10 @@ load_dotenv(dotenv_path="FastApiApp/.env")
 
 openai.api_key = os.getenv("OPEN_API_KEY")
 app = FastAPI()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class TextInput(BaseModel):
@@ -31,10 +36,15 @@ async def process_menu(input_data: TextInput):
         dict: The structured menu in JSON format.
     """
     if not openai.api_key:
+        logger.error("OpenAI API key not found.")
         raise HTTPException(status_code=500, detail="OpenAI API key not found.")
 
     if not input_data.text.strip():
+        logger.error("Input text cannot be empty.")
         raise HTTPException(status_code=400, detail="Input text cannot be empty.")
+
+    # Debug: Print the received JSON data
+    logger.info(f"Received JSON data: {input_data.json()}")
 
     # Generate a structured prompt for the model
     prompt = (
@@ -44,6 +54,7 @@ async def process_menu(input_data: TextInput):
         "If no clear section is identified, create an 'Uncategorized' section and group items under it. "
         "If an item has dietary restriction 'a', it should also include all related restrictions by default. "
         "For example, if something is vegan, it is also vegetarian by default. "
+        "Validate the JSON structure to ensure it is complete and well-formed. "
         "Output the structured JSON format as shown below:\n\n"
         f"Extracted Text:\n{input_data.text}\n\n"
         "Output JSON format:\n"
@@ -81,7 +92,7 @@ async def process_menu(input_data: TextInput):
                 },
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=5000,
+            max_tokens=6000,
             temperature=0.3,
         )
 
@@ -89,6 +100,12 @@ async def process_menu(input_data: TextInput):
         return {"structured_menu": structured_menu}
 
     except openai.OpenAIError as exc:
+        logger.error(f"OpenAI API error: {str(exc)}")
         raise HTTPException(
             status_code=400, detail=f"OpenAI API error: {str(exc)}"
+        ) from exc
+    except Exception as exc:
+        logger.error(f"Unexpected error: {str(exc)}")
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {str(exc)}"
         ) from exc
