@@ -2,9 +2,10 @@
 
 ## Features
 
-- Upload PDF menus and extract text
-- Process extracted text using OpenAI's GPT-4 model
-- Display structured menu data
+- Automatic database creation and validation upon running the Django server.
+- Upload PDF menus and extract text as well as editing before sending for processing.
+- Process extracted text using OpenAI's GPT-4 model.
+- Display structured menu data and reports.
 
 ## Installation
 
@@ -52,7 +53,7 @@
 
 ### 4. Modify Django settings to use the new database
 
-- Open `settings.py` in your Django project.
+- Open `settings.py` in your Django project (located in MenuBackend/MenuBackend).
 - Update the `DATABASES` setting to use the new database:
 
     ```python
@@ -125,6 +126,7 @@
 
 - Open your web browser and go to `http://127.0.0.1:8000/` for the Django application.
 - The FastAPI server will be running on `http://127.0.0.1:8001/`.
+- For the Django admin shell go to `http://127.0.0.1:8000/admin` and for the Fast AI API docs go to `http://127.0.0.1:8001/docs`.
 
 ## Notes
 

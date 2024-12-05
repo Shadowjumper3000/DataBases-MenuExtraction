@@ -5,16 +5,20 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **1. Text Extraction from PDFs**
+
 - **Challenge:** Variability in menu formats.
   - Menus often have inconsistent layouts, fonts, and text alignments.
   - Extracted text may contain noise, such as irrelevant headers or page numbers.
+  - Using OCR yielded no sizeable benefit (perhaps a problem on our part), but added noticeable overhead to the text processing especially when a pdf would contain multiple embedded images.
 - **Solution:**
-  - Used libraries like `pdfplumber` and `PyPDF2` for text extraction.
+  - Used `pdfplumber` for text extraction.
   - Applied preprocessing to clean and standardize the extracted text.
+  - Decided to skip OCR even though it limits compatiblity od PDF for the sake of compatibility and speed.
 
 ---
 
 ## **2. AI Integration**
+
 - **Challenge:** Converting unstructured text into structured JSON.
   - GPT-4 occasionally misinterpreted menu items or failed to identify sections.
   - API rate limits and processing time affected workflow efficiency.
@@ -26,6 +30,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **3. Data Validation**
+
 - **Challenge:** Ensuring data integrity before database insertion.
   - Menu data often included incomplete or incorrectly formatted information.
   - Duplicate entries posed a risk of database inconsistencies.
@@ -37,6 +42,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **4. Database Design**
+
 - **Challenge:** Balancing normalization with query performance.
   - Highly normalized schemas sometimes resulted in complex queries and joins.
   - Indexing strategy required careful planning to optimize frequent operations.
@@ -47,6 +53,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **5. Filtering and Query Logic**
+
 - **Challenge:** Handling complex filtering criteria.
   - Dietary restriction filtering required joining multiple tables.
   - Filtering food items by restaurants and vice versa added another layer of complexity.
@@ -57,6 +64,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **6. User Interface Design**
+
 - **Challenge:** Maintaining usability with dynamic filtering.
   - The UI needed to handle dynamic updates without disrupting the page layout.
   - Balancing simplicity and functionality in filters was difficult.
@@ -67,6 +75,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **7. Deployment and Scalability**
+
 - **Challenge:** Ensuring the system is robust and scalable.
   - Handling large PDFs and high API traffic could strain resources.
   - Database performance needed to scale with increasing data volume.
@@ -76,6 +85,7 @@ This document outlines the key challenges encountered during the development and
 ---
 
 ## **8. Error Handling**
+
 - **Challenge:** Managing errors across multiple layers (PDF extraction, API, database).
   - Failures in one component could cascade into others.
 - **Solution:**
@@ -83,6 +93,5 @@ This document outlines the key challenges encountered during the development and
   - Designed fallback mechanisms, such as retry logic for API failures and graceful handling of database constraints.
 
 ---
-
 
 These challenges and their resolutions reflect the effort and decisions made to ensure the system's reliability, usability, and scalability.

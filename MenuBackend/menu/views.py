@@ -236,7 +236,7 @@ def past_menus(request, restaurant_id):
         "-version"
     )
 
-    # Get menu items for each past menu
+    # * Get menu items for each past menu
     menu_details = {}
     for menu in past_menus:
         menu_items = (
