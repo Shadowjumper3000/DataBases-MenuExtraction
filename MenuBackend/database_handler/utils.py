@@ -11,6 +11,7 @@ from .models import (
 from django.conf import settings
 import MySQLdb
 import json
+from decimal import Decimal, InvalidOperation
 
 
 def insert_menu_data(menu_data):
@@ -21,10 +22,10 @@ def insert_menu_data(menu_data):
     restaurant, created = Restaurant.objects.get_or_create(
         name=restaurant_data["name"],
         defaults={
-            "address": restaurant_data["address"],
-            "phone_number": restaurant_data["phone_number"],
-            "email": restaurant_data["email"],
-            "website": restaurant_data["website"],
+            "address": restaurant_data.get("address", ""),
+            "phone_number": restaurant_data.get("phone_number", ""),
+            "email": restaurant_data.get("email", ""),
+            "website": restaurant_data.get("website", ""),
         },
     )
     print("Restaurant created:", restaurant)
@@ -34,62 +35,6 @@ def insert_menu_data(menu_data):
         Menu.objects.filter(restaurant=restaurant).order_by("-version").first()
     )
     new_version_number = latest_menu.version + 1 if latest_menu else 1
-
-    # Serialize the latest menu data to compare with the new menu data
-    def serialize_menu(menu):
-        menu_sections = MenuSection.objects.filter(menu=menu)
-        sections_data = []
-        for section in menu_sections:
-            items = MenuItem.objects.filter(menu_section=section)
-            items_data = [
-                {
-                    "name": item.food_item.name,
-                    "description": item.food_item.description,
-                    "price": float(item.price),
-                    "dietary_restrictions": [
-                        restriction.dietary_restriction.name
-                        for restriction in item.food_item.fooditemrestriction_set.all()
-                    ],
-                }
-                for item in items
-            ]
-            sections_data.append(
-                {
-                    "section": section.name,
-                    "description": section.description,
-                    "position": section.position,
-                    "items": items_data,
-                }
-            )
-        return {
-            "restaurant": {
-                "name": menu.restaurant.name,
-                "address": menu.restaurant.address,
-                "phone_number": menu.restaurant.phone_number,
-                "email": menu.restaurant.email,
-                "website": menu.restaurant.website,
-            },
-            "menus": sections_data,
-        }
-
-    # Check if the new menu data is the same as the latest menu data
-    if latest_menu:
-        latest_menu_data = serialize_menu(latest_menu)
-        if json.dumps(latest_menu_data, sort_keys=True) == json.dumps(
-            menu_data, sort_keys=True
-        ):
-            # Log the new version without creating duplicates
-            ProcessingLog.objects.create(
-                menu=latest_menu,
-                action="Version",
-                description=f"Version {new_version_number} logged without changes",
-                performed_by="System",
-            )
-            print(
-                f"Version {new_version_number} logged without changes for menu:",
-                latest_menu,
-            )
-            return
 
     # Create the new menu
     menu = Menu.objects.create(
@@ -130,13 +75,20 @@ def insert_menu_data(menu_data):
             )
             print("Food item created:", food_item)
 
-            MenuItem.objects.create(
+            # Handle invalid price values
+            try:
+                price = Decimal(item_data.get("price", "0.00"))
+            except (InvalidOperation, TypeError, ValueError) as e:
+                print(f"Invalid price value: {item_data.get('price')}, error: {e}")
+                price = Decimal("0.00")
+
+            menu_item = MenuItem.objects.create(
                 menu=menu,
                 menu_section=menu_section,
                 food_item=food_item,
-                price=item_data.get("price", 0.00),
+                price=Decimal(price),
             )
-            print("Menu item created:", MenuItem)
+            print("Menu item created:", menu_item)
 
             for restriction in item_data.get("dietary_restrictions", []):
                 dietary_restriction, created = DietaryRestriction.objects.get_or_create(

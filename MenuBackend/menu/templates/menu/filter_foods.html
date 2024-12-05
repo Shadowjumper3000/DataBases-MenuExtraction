@@ -25,7 +25,8 @@
         <li>
             <strong>{{ item.food_item.name }}</strong><br>
             {{ item.food_item.description }}<br>
-            Price: ${{ item.food_item.price }}
+            Price: ${{ item.food_item.price }}<br>
+            <a href="{% url 'restaurant_detail' item.food_item.menuitem_set.first.menu.restaurant.id %}" class="btn btn-primary">View Restaurant</a>
         </li>
         {% endfor %}
     </ul>
