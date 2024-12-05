@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load menu_tags %}
 
 {% block title %}{{ restaurant.name }} - Past Menus{% endblock %}
 
@@ -11,17 +12,86 @@
 
 <h2>Past Menus</h2>
 {% if past_menus %}
-    <ul>
-        {% for menu in past_menus %}
-            <li>
-                <strong>Version {{ menu.version }}</strong> - {{ menu.name }}<br>
-                {{ menu.description }}
-            </li>
-        {% endfor %}
-    </ul>
+    {% for menu in past_menus %}
+        <div class="menu-container">
+            <h3>Version {{ menu.version }} - {{ menu.name }}</h3>
+            <p>{{ menu.description }}</p>
+            
+            <div id="menu-{{ menu.id }}" class="menu-content">
+                <script>
+                    const menuSections_{{ menu.id }} = JSON.parse('{{ menu_details|get_item:menu.id|escapejs }}');
+                    const menuContainer_{{ menu.id }} = document.getElementById('menu-{{ menu.id }}');
+                    
+                    for (const [sectionName, items] of Object.entries(menuSections_{{ menu.id }})) {
+                        const sectionDiv = document.createElement('div');
+                        sectionDiv.classList.add('menu-section');
+                        sectionDiv.innerHTML = `<h4>${sectionName}</h4>`;
+                        
+                        const itemsDiv = document.createElement('div');
+                        itemsDiv.classList.add('menu-items');
+                        
+                        items.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.classList.add('menu-item');
+                            itemDiv.innerHTML = `
+                                <div>
+                                    <p>${item.food_item}</p>
+                                </div>
+                                <div class="description">
+                                    <p>$${item.price.toFixed(2)}</p>
+                                    ${item.description ? `<p>${item.description}</p>` : ''}
+                                    ${item.dietary_restrictions.length ? `
+                                        <p class="dietary-restrictions">
+                                            ${item.dietary_restrictions.join(', ')}
+                                        </p>` : ''}
+                                </div>
+                            `;
+                            itemsDiv.appendChild(itemDiv);
+                        });
+                        
+                        sectionDiv.appendChild(itemsDiv);
+                        menuContainer_{{ menu.id }}.appendChild(sectionDiv);
+                    }
+                </script>
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
 {% else %}
     <p>No past menus available.</p>
 {% endif %}
 
-<a href="{% url 'restaurant_detail' restaurant.id %}">Back to Active Menu</a>
+<a href="{% url 'restaurant_detail' restaurant.id %}" class="btn">Back to Active Menu</a>
+
+<style>
+    .menu-container {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    .menu-section {
+        margin: 15px 0;
+    }
+    .menu-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .dietary-restrictions {
+        color: #666;
+        font-style: italic;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

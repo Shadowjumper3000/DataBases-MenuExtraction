@@ -1,3 +1,5 @@
+-- *! Deprecated
+
 CREATE DATABASE restaurants;
 USE restaurants;
 -- Restaurant table
