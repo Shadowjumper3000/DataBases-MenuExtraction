@@ -9,7 +9,9 @@
         <tr>
             <th>Restaurant</th>
             <th>Menu Name</th>
+            <th>Version</th>
             <th>Description</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -17,7 +19,11 @@
         <tr>
             <td>{{ menu.restaurant.name }}</td>
             <td>{{ menu.name }}</td>
+            <td>{{ menu.version }}</td>
             <td>{{ menu.description }}</td>
+            <td>
+                <a href="{% url 'menu_detail' menu.id %}" class="btn">View Menu</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

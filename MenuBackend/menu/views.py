@@ -230,24 +230,42 @@ def restaurant_detail(request, restaurant_id):
 def past_menus(request, restaurant_id):
     """
     View to display the past menus of a specific restaurant.
-
-    Args:
-    - request: The HTTP request object.
-    - restaurant_id: The ID of the restaurant to display.
-
-    Returns:
-    - Rendered HTML page with the restaurant's past menus.
     """
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     past_menus = Menu.objects.filter(restaurant=restaurant, is_active=False).order_by(
         "-version"
     )
+
+    # Get menu items for each past menu
+    menu_details = {}
+    for menu in past_menus:
+        menu_items = (
+            MenuItem.objects.filter(menu=menu)
+            .select_related("menu", "menu_section", "food_item")
+            .prefetch_related("food_item__fooditemrestriction_set__dietary_restriction")
+        )
+        sections = defaultdict(list)
+        for item in menu_items:
+            sections[item.menu_section.name].append(
+                {
+                    "food_item": item.food_item.name,
+                    "price": float(item.price),
+                    "description": item.food_item.description,
+                    "dietary_restrictions": [
+                        restriction.dietary_restriction.name
+                        for restriction in item.food_item.fooditemrestriction_set.all()
+                    ],
+                }
+            )
+        menu_details[menu.id] = json.dumps(sections)
+
     return render(
         request,
         "menu/past_menus.html",
         {
             "restaurant": restaurant,
             "past_menus": past_menus,
+            "menu_details": menu_details,
         },
     )
 
@@ -306,7 +324,11 @@ def menu_report(request):
     """
     View to generate a report on all menus.
     """
-    menus = Menu.objects.select_related("restaurant").all()
+    menus = (
+        Menu.objects.select_related("restaurant")
+        .all()
+        .order_by("restaurant__name", "-version")
+    )
     context = {"menus": menus}
     return render(request, "menu/reports/menu_report.html", context)
 
@@ -335,7 +357,11 @@ def active_menu_report(request):
     """
     View to generate a report on active menus.
     """
-    active_menus = Menu.objects.filter(is_active=True)
+    active_menus = (
+        Menu.objects.filter(is_active=True)
+        .select_related("restaurant")
+        .order_by("restaurant__name")
+    )
     context = {"active_menus": active_menus}
     return render(request, "menu/reports/active_menu_report.html", context)
 
@@ -346,9 +372,6 @@ def menu_detail(request, menu_id):
     return render(
         request, "menu/menu_detail.html", {"menu": menu, "versions": versions}
     )
-
-
-# *! Deprecated
 
 
 def filter_restrictions_by_food(request):

@@ -3,11 +3,120 @@
 {% block title %}Reports Home{% endblock %}
 
 {% block content %}
-<h1>Reports Home</h1>
-<ul class="report-links">
-    <li><a href="{% url 'menu_report' %}">Menu Report</a></li>
-    <li><a href="{% url 'food_item_restriction_report' %}">Food Item Restriction Report</a></li>
-    <li><a href="{% url 'processing_log_report' %}">Processing Log Report</a></li>
-    <li><a href="{% url 'active_menu_report' %}">Active Menu Report</a></li>
-</ul>
+<div class="reports-container">
+    <h1>Reports Dashboard</h1>
+    <div class="reports-grid">
+        <div class="report-card">
+            <div class="report-icon">📊</div>
+            <h2>Menu Report</h2>
+            <p>View all menus across restaurants with version history</p>
+            <a href="{% url 'menu_report' %}" class="report-btn">View Report</a>
+        </div>
+
+        <div class="report-card">
+            <div class="report-icon">🍽️</div>
+            <h2>Active Menu Report</h2>
+            <p>See currently active menus for all restaurants</p>
+            <a href="{% url 'active_menu_report' %}" class="report-btn">View Report</a>
+        </div>
+
+        <div class="report-card">
+            <div class="report-icon">🥗</div>
+            <h2>Food Restrictions</h2>
+            <p>Review dietary restrictions for all food items</p>
+            <a href="{% url 'food_item_restriction_report' %}" class="report-btn">View Report</a>
+        </div>
+
+        <div class="report-card">
+            <div class="report-icon">📝</div>
+            <h2>Processing Logs</h2>
+            <p>Track menu processing history and updates</p>
+            <a href="{% url 'processing_log_report' %}" class="report-btn">View Report</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .reports-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .reports-container h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+    }
+
+    .reports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        padding: 1rem;
+    }
+
+    .report-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .report-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .report-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .report-card h2 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+
+    .report-card p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .report-btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-weight: 500;
+    }
+
+    .report-btn:hover {
+        background-color: #0056b3;
+    }
+
+    @media (max-width: 768px) {
+        .reports-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .reports-container {
+            padding: 1rem;
+        }
+
+        .report-card {
+            padding: 1.2rem;
+        }
+    }
+</style>
 {% endblock %}
