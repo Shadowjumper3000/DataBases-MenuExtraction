@@ -13,5 +13,21 @@
     </li>
     {% endfor %}
 </ul>
-<a href="{% url 'update_menu' menu.id %}">Update Menu</a>
+<a href="{% url 'restaurant_detail' menu.restaurant.id %}" class="report-btn">Back to Restaurant</a>
+
+<style>
+    .report-btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-weight: 500;
+    }
+    .report-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

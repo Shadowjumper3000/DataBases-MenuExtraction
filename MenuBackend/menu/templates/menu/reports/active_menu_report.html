@@ -22,10 +22,26 @@
             <td>{{ menu.version }}</td>
             <td>{{ menu.description }}</td>
             <td>
-                <a href="{% url 'menu_detail' menu.id %}" class="btn">View Menu</a>
+                <a href="{% url 'menu_detail' menu.id %}" class="report-btn">View Menu</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<style>
+    .report-btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-weight: 500;
+    }
+    .report-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

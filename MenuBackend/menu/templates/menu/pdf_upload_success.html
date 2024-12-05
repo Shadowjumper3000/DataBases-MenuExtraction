@@ -3,31 +3,203 @@
 {% block title %}Text Extraction Success{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Text Extraction Success</h1>
-    <h2>Structured Menu:</h2>
-    {% if structured_menu %}
-        <ul>
-        {% for section in structured_menu.menus %}
-            <li class="menu-section">
-                <strong>{{ section.section }}</strong>
-                <ul>
-                    {% for item in section.items %}
-                        <li class="menu-item">
-                            <p class="item-name">{{ item.name }}</p>
-                            <p class="item-price">${{ item.price }}</p>
-                            <p class="item-description">{{ item.description }}</p>
-                            {% if item.dietary_restrictions %}
-                                <p class="dietary-restrictions">Dietary Restrictions: {{ item.dietary_restrictions|join:", " }}</p>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No structured menu available.</p>
-    {% endif %}
+<div class="success-container">
+    <div class="success-header">
+        <div class="success-icon">✓</div>
+        <h1>Text Extraction Success</h1>
+        <p class="success-message">Menu data has been successfully processed and added to the database.</p>
+    </div>
+
+    <div class="menu-preview">
+        <h2>Structured Menu Preview</h2>
+        {% if structured_menu %}
+            {% for section in structured_menu.menus %}
+                <div class="menu-section">
+                    <h3>{{ section.section }}</h3>
+                    <div class="menu-items">
+                        {% for item in section.items %}
+                            <div class="menu-item">
+                                <div class="item-header">
+                                    <span class="item-name">{{ item.name }}</span>
+                                    <span class="item-price">${{ item.price }}</span>
+                                </div>
+                                {% if item.description %}
+                                    <p class="item-description">{{ item.description }}</p>
+                                {% endif %}
+                                {% if item.dietary_restrictions %}
+                                    <div class="dietary-tags">
+                                        {% for restriction in item.dietary_restrictions %}
+                                            <span class="dietary-tag">{{ restriction }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">No structured menu data available.</p>
+        {% endif %}
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'upload_pdf' %}" class="report-btn">Upload Another Menu</a>
+        <a href="{% url 'restaurant_list' %}" class="report-btn">View All Restaurants</a>
+    </div>
 </div>
+
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .success-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .success-icon {
+        font-size: 3rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .success-message {
+        color: #28a745;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    .menu-preview {
+        margin: 2rem 0;
+    }
+
+    .menu-preview h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .menu-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .menu-section h3 {
+        color: #007bff;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .menu-items {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .menu-item {
+        padding: 1rem;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-name {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .item-price {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .item-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0.5rem 0;
+    }
+
+    .dietary-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .dietary-tag {
+        background: #e9ecef;
+        color: #495057;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .report-btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-weight: 500;
+    }
+
+    .report-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .success-container {
+            margin: 1rem;
+            padding: 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .report-btn {
+            text-align: center;
+        }
+    }
+</style>
 {% endblock %}
