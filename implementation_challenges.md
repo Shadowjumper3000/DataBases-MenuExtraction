@@ -84,13 +84,5 @@ This document outlines the key challenges encountered during the development and
 
 ---
 
-## **9. Integration Testing**
-- **Challenge:** Ensuring smooth integration between ETL pipeline, API, and database.
-  - Misaligned data formats and edge cases caused intermittent failures.
-- **Solution:**
-  - Developed comprehensive test cases covering end-to-end scenarios.
-  - Conducted extensive testing with sample PDFs of varying complexity.
-
----
 
 These challenges and their resolutions reflect the effort and decisions made to ensure the system's reliability, usability, and scalability.
