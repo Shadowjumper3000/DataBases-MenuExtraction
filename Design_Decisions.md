@@ -1,24 +1,3 @@
-# **Restaurant Menu Database Project**
-
-## **Building an AI-Powered Menu Management System**
-
----
-
-## **Project Overview**
-Create a database system that processes restaurant menu PDFs using AI (Claude or ChatGPT) and stores the structured data. This project demonstrates the integration of database design, ETL processes, and AI-powered text processing.
-
----
-
-## **Learning Objectives**
-- Design and implement a normalized database schema.
-- Create an ETL pipeline to extract, transform, and load menu data.
-- Integrate with AI APIs to process unstructured text.
-- Implement robust data validation mechanisms.
-- Write and optimize SQL queries for data retrieval and analysis.
-- Document database design decisions in detail.
-
----
-
 ## **Design Decisions**
 
 ### **1. Technology Stack**
